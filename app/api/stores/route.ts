@@ -4,17 +4,17 @@ import { slugify } from '@/lib/slugify'
 
 export async function GET() {
   try {
-    const stores = await prisma.store.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
+    const stores = await prisma.store.findMany()
 
     return NextResponse.json(stores)
   } catch (error) {
-    console.error('Erro ao buscar lojas:', error)
+    console.error('ERRO REAL AO BUSCAR LOJAS:', error)
+
     return NextResponse.json(
-      { error: 'Erro ao buscar lojas' },
+      {
+        error: 'Erro ao buscar lojas',
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     )
   }
@@ -60,9 +60,13 @@ export async function POST(req: Request) {
 
     return NextResponse.json(store, { status: 201 })
   } catch (error) {
-    console.error('Erro ao criar loja:', error)
+    console.error('ERRO REAL AO CRIAR LOJA:', error)
+
     return NextResponse.json(
-      { error: 'Erro ao criar loja' },
+      {
+        error: 'Erro ao criar loja',
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     )
   }
