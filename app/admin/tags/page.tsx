@@ -2,50 +2,53 @@
 
 import { useEffect, useState } from 'react'
 
-type Store = {
+type Tag = {
   id: number
   name: string
   slug: string
-  logoUrl: string | null
-  affiliateUrl: string | null
+  icon: string | null
+  type: 'categoria' | 'beneficio' | 'produto' | 'especial'
+  isFeatured: boolean
   isActive: boolean
   createdAt: string
   updatedAt: string
 }
 
-export default function AdminStoresPage() {
-  const [stores, setStores] = useState<Store[]>([])
+export default function AdminTagsPage() {
+  const [tags, setTags] = useState<Tag[]>([])
   const [name, setName] = useState('')
-  const [logoUrl, setLogoUrl] = useState('')
-  const [affiliateUrl, setAffiliateUrl] = useState('')
+  const [icon, setIcon] = useState('')
+  const [type, setType] = useState<'categoria' | 'beneficio' | 'produto' | 'especial'>('categoria')
+  const [isFeatured, setIsFeatured] = useState(false)
   const [isActive, setIsActive] = useState(true)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
-  async function loadStores() {
+  async function loadTags() {
     try {
-      const res = await fetch('/api/stores')
+      const res = await fetch('/api/tags')
       const data = await res.json()
 
       if (Array.isArray(data)) {
-        setStores(data)
+        setTags(data)
       } else {
         console.error('Resposta inesperada da API:', data)
-        setStores([])
+        setTags([])
       }
     } catch (error) {
-      console.error('Erro ao carregar lojas:', error)
-      setStores([])
+      console.error('Erro ao carregar tags:', error)
+      setTags([])
     }
   }
 
-  function handleEdit(store: Store) {
-    setEditingId(store.id)
-    setName(store.name)
-    setLogoUrl(store.logoUrl || '')
-    setAffiliateUrl(store.affiliateUrl || '')
-    setIsActive(store.isActive)
+  function handleEdit(tag: Tag) {
+    setEditingId(tag.id)
+    setName(tag.name)
+    setIcon(tag.icon || '')
+    setType(tag.type)
+    setIsFeatured(tag.isFeatured)
+    setIsActive(tag.isActive)
     setMessage('')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -53,39 +56,40 @@ export default function AdminStoresPage() {
   function handleCancelEdit() {
     setEditingId(null)
     setName('')
-    setLogoUrl('')
-    setAffiliateUrl('')
+    setIcon('')
+    setType('categoria')
+    setIsFeatured(false)
     setIsActive(true)
     setMessage('')
   }
 
   async function handleDelete(id: number) {
-    const confirmed = window.confirm('Tem certeza que deseja excluir esta loja?')
+    const confirmed = window.confirm('Tem certeza que deseja excluir esta tag?')
 
     if (!confirmed) return
 
     try {
-      const res = await fetch(`/api/stores/${id}`, {
+      const res = await fetch(`/api/tags/${id}`, {
         method: 'DELETE',
       })
 
       const data = await res.json()
 
       if (!res.ok) {
-        setMessage(data.error || 'Erro ao excluir loja')
+        setMessage(data.error || 'Erro ao excluir tag')
         return
       }
 
-      setMessage('Loja excluída com sucesso!')
+      setMessage('Tag excluída com sucesso!')
 
       if (editingId === id) {
         handleCancelEdit()
       }
 
-      await loadStores()
+      await loadTags()
     } catch (error) {
-      console.error('Erro ao excluir loja:', error)
-      setMessage('Erro ao excluir loja')
+      console.error('Erro ao excluir tag:', error)
+      setMessage('Erro ao excluir tag')
     }
   }
 
@@ -95,7 +99,7 @@ export default function AdminStoresPage() {
     setMessage('')
 
     try {
-      const url = editingId ? `/api/stores/${editingId}` : '/api/stores'
+      const url = editingId ? `/api/tags/${editingId}` : '/api/tags'
       const method = editingId ? 'PUT' : 'POST'
 
       const res = await fetch(url, {
@@ -105,8 +109,9 @@ export default function AdminStoresPage() {
         },
         body: JSON.stringify({
           name,
-          logoUrl,
-          affiliateUrl,
+          icon,
+          type,
+          isFeatured,
           isActive,
         }),
       })
@@ -114,61 +119,62 @@ export default function AdminStoresPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setMessage(data.error || 'Erro ao salvar loja')
+        setMessage(data.error || 'Erro ao salvar tag')
         setLoading(false)
         return
       }
 
       setMessage(
         editingId
-          ? 'Loja atualizada com sucesso!'
-          : 'Loja cadastrada com sucesso!'
+          ? 'Tag atualizada com sucesso!'
+          : 'Tag cadastrada com sucesso!'
       )
 
       setEditingId(null)
       setName('')
-      setLogoUrl('')
-      setAffiliateUrl('')
+      setIcon('')
+      setType('categoria')
+      setIsFeatured(false)
       setIsActive(true)
 
-      await loadStores()
+      await loadTags()
     } catch (error) {
-      console.error('Erro ao salvar loja:', error)
-      setMessage('Erro ao salvar loja')
+      console.error('Erro ao salvar tag:', error)
+      setMessage('Erro ao salvar tag')
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    loadStores()
+    loadTags()
   }, [])
 
   return (
     <main className="min-h-screen bg-gray-50 p-8">
       <div className="mx-auto max-w-5xl space-y-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Admin - Lojas</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Admin - Tags</h1>
           <p className="mt-2 text-gray-600">
-            Cadastre e gerencie as lojas parceiras do portal.
+            Cadastre e gerencie categorias, benefícios, produtos e tags especiais.
           </p>
         </div>
 
         <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
           <h2 className="text-xl font-semibold text-gray-900">
-            {editingId ? 'Editar loja' : 'Cadastrar nova loja'}
+            {editingId ? 'Editar tag' : 'Cadastrar nova tag'}
           </h2>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
-                Nome da loja
+                Nome da tag
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Ex: Magazine Luiza"
+                placeholder="Ex: Restaurantes"
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-black"
                 required
               />
@@ -176,28 +182,49 @@ export default function AdminStoresPage() {
 
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
-                URL da logo
+                Ícone
               </label>
               <input
                 type="text"
-                value={logoUrl}
-                onChange={(e) => setLogoUrl(e.target.value)}
-                placeholder="https://exemplo.com/logo.png"
+                value={icon}
+                onChange={(e) => setIcon(e.target.value)}
+                placeholder="Ex: pizza, home, tag, heart..."
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-black"
               />
             </div>
 
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
-                URL de afiliado
+                Tipo
               </label>
-              <input
-                type="text"
-                value={affiliateUrl}
-                onChange={(e) => setAffiliateUrl(e.target.value)}
-                placeholder="https://www.loja.com.br"
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-black"
-              />
+              <select
+                value={type}
+                onChange={(e) =>
+                  setType(
+                    e.target.value as 'categoria' | 'beneficio' | 'produto' | 'especial'
+                  )
+                }
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-black"
+              >
+                <option value="categoria">Categoria</option>
+                <option value="beneficio">Benefício</option>
+                <option value="produto">Produto</option>
+                <option value="especial">Especial</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Destaque
+              </label>
+              <select
+                value={isFeatured ? 'sim' : 'nao'}
+                onChange={(e) => setIsFeatured(e.target.value === 'sim')}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-black"
+              >
+                <option value="nao">Não</option>
+                <option value="sim">Sim</option>
+              </select>
             </div>
 
             <div>
@@ -220,7 +247,7 @@ export default function AdminStoresPage() {
                 disabled={loading}
                 className="rounded-lg bg-black px-5 py-3 text-white transition hover:opacity-90 disabled:opacity-50"
               >
-                {loading ? 'Salvando...' : editingId ? 'Atualizar loja' : 'Salvar loja'}
+                {loading ? 'Salvando...' : editingId ? 'Atualizar tag' : 'Salvar tag'}
               </button>
 
               {editingId && (
@@ -240,62 +267,64 @@ export default function AdminStoresPage() {
 
         <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
           <h2 className="text-xl font-semibold text-gray-900">
-            Lojas cadastradas
+            Tags cadastradas
           </h2>
 
           <div className="mt-6 space-y-4">
-            {!Array.isArray(stores) || stores.length === 0 ? (
-              <p className="text-gray-500">Nenhuma loja cadastrada ainda.</p>
+            {!Array.isArray(tags) || tags.length === 0 ? (
+              <p className="text-gray-500">Nenhuma tag cadastrada ainda.</p>
             ) : (
-              stores.map((store) => (
+              tags.map((tag) => (
                 <div
-                  key={store.id}
+                  key={tag.id}
                   className="rounded-xl border border-gray-200 p-4"
                 >
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div className="space-y-1">
                       <h3 className="text-lg font-semibold text-gray-900">
-                        {store.name}
+                        {tag.name}
                       </h3>
 
                       <p className="text-sm text-gray-500">
-                        Slug: {store.slug}
+                        Slug: {tag.slug}
                       </p>
 
-                      {store.logoUrl && (
-                        <p className="break-all text-sm text-gray-500">
-                          Logo: {store.logoUrl}
+                      <p className="text-sm text-gray-500">
+                        Tipo: {tag.type}
+                      </p>
+
+                      {tag.icon && (
+                        <p className="text-sm text-gray-500">
+                          Ícone: {tag.icon}
                         </p>
                       )}
 
-                      {store.affiliateUrl && (
-                        <p className="break-all text-sm text-gray-500">
-                          Afiliado: {store.affiliateUrl}
-                        </p>
-                      )}
+                      <p className="text-sm text-gray-500">
+                        Destaque: {tag.isFeatured ? 'Sim' : 'Não'}
+                      </p>
                     </div>
 
                     <div className="flex flex-col items-start gap-3 md:items-end">
                       <span
                         className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-medium ${
-                          store.isActive
+                          tag.isActive
                             ? 'bg-green-100 text-green-700'
                             : 'bg-gray-200 text-gray-700'
                         }`}
                       >
-                        {store.isActive ? 'Ativa' : 'Inativa'}
+                        {tag.isActive ? 'Ativa' : 'Inativa'}
                       </span>
 
                       <div className="flex gap-2">
                         <button
-                          onClick={() => handleEdit(store)}
+                          onClick={() => handleEdit(tag)}
                           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
                         >
                           Editar
                         </button>
 
                         <button
-                          onClick={() => handleDelete(store.id)}
+                          onClick={() => handleDelete(tag.id)}
                           className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
                         >
                           Excluir

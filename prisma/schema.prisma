@@ -8,12 +8,82 @@ datasource db {
 }
 
 model Store {
-  id           Int      @id @default(autoincrement())
-  name         String
-  slug         String   @unique
-  logoUrl      String?
-  affiliateUrl String?
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  name          String
+  slug          String   @unique
+  logoUrl       String?
+  affiliateUrl  String?
+  description   String?
+  websiteUrl    String?
+  isFeatured    Boolean  @default(false)
+  isActive      Boolean  @default(true)
+
+  coupons       Coupon[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Tag {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  icon        String?
+  type        TagType
+  isFeatured  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+
+  couponTags  CouponTag[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Coupon {
+  id             Int      @id @default(autoincrement())
+  title          String
+  description    String?
+  code           String?
+  rules          String?
+  discountText   String?
+  discountValue  Int?
+  couponType     CouponType
+  redirectUrl    String?
+  imageUrl       String?
+
+  storeId        Int
+  store          Store    @relation(fields: [storeId], references: [id])
+
+  couponTags     CouponTag[]
+
+  isFeatured     Boolean  @default(false)
+  isVerified     Boolean  @default(false)
+  isActive       Boolean  @default(true)
+  expiresAt      DateTime?
+  usesCount      Int      @default(0)
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model CouponTag {
+  couponId   Int
+  tagId      Int
+
+  coupon     Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  tag        Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([couponId, tagId])
+}
+
+enum TagType {
+  categoria
+  beneficio
+  produto
+  especial
+}
+
+enum CouponType {
+  coupon
+  offer
 }
