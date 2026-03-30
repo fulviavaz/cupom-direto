@@ -1,5 +1,7 @@
 import './globals.css'
 import type { Metadata } from 'next'
+import CategoriesBar from '@/components/categories-bar'
+import Header from '@/components/header'
 
 export const metadata: Metadata = {
   title: 'Portal de Cupons',
@@ -13,7 +15,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body>{children}</body>
+      <body>
+        <Header />
+        <CategoriesBar />
+        {children}
+      </body>
     </html>
   )
 }
