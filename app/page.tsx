@@ -30,7 +30,7 @@ export default async function HomePage() {
     orderBy: {
       name: 'asc',
     },
-    take: 8,
+    take: 6,
   })
 
   const featuredCategories = await prisma.tag.findMany({
@@ -46,88 +46,96 @@ export default async function HomePage() {
   })
 
   const totalCoupons = await prisma.coupon.count({
-    where: {
-      isActive: true,
-    },
+    where: { isActive: true },
   })
 
   const totalStores = await prisma.store.count({
+    where: { isActive: true },
+  })
+
+  const totalCategories = await prisma.tag.count({
     where: {
       isActive: true,
+      type: 'categoria',
     },
   })
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-[#f5f5f5]">
       {/* HERO */}
-      <section className="bg-red-600 text-white">
-        <div className="mx-auto max-w-6xl px-6 py-16">
-          <div className="grid items-center gap-10 lg:grid-cols-2">
+      <section className="border-b border-gray-200 bg-white">
+        <div className="mx-auto max-w-6xl px-6 py-12">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.2fr_0.8fr]">
             <div>
-              <span className="inline-flex rounded-full bg-white/15 px-3 py-1 text-sm font-medium">
-                Plataforma de cupons e ofertas
+              <span className="inline-flex rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-600">
+                Cupons, ofertas e lojas parceiras
               </span>
 
-              <h1 className="mt-6 text-4xl font-bold leading-tight md:text-5xl">
-                Economize em compras com cupons, ofertas e descontos reais
+              <h1 className="mt-5 text-4xl font-bold leading-tight text-gray-900 md:text-5xl">
+                Conectando você com os melhores cupons
               </h1>
 
-              <p className="mt-4 max-w-xl text-base text-red-50 md:text-lg">
-                Encontre promoções atualizadas, ofertas das melhores lojas e
-                cupons ativos organizados por categoria.
+              <p className="mt-4 max-w-2xl text-base text-gray-600 md:text-lg">
+                Descubra descontos reais, ofertas verificadas e cupons ativos
+                das principais lojas em um só lugar.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/coupons"
-                  className="rounded-xl bg-white px-5 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+                  className="rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
                 >
                   Ver todos os cupons
                 </Link>
 
                 <Link
                   href="/admin/coupons"
-                  className="rounded-xl border border-white/30 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                  className="rounded-xl border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100"
                 >
-                  Ir para o admin
+                  Acessar admin
                 </Link>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-2xl bg-white p-6 text-gray-900 shadow-sm">
-                <p className="text-sm text-gray-500">Cupons ativos</p>
+            <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-2">
+              <div className="rounded-2xl bg-red-600 p-5 text-white shadow-sm">
+                <p className="text-sm text-red-100">Cupons ativos</p>
                 <p className="mt-2 text-3xl font-bold">{totalCoupons}</p>
               </div>
 
-              <div className="rounded-2xl bg-white p-6 text-gray-900 shadow-sm">
-                <p className="text-sm text-gray-500">Lojas parceiras</p>
+              <div className="rounded-2xl bg-white p-5 text-gray-900 shadow-sm">
+                <p className="text-sm text-gray-500">Lojas</p>
                 <p className="mt-2 text-3xl font-bold">{totalStores}</p>
               </div>
 
-              <div className="col-span-2 rounded-2xl bg-white/10 p-6 backdrop-blur">
-                <p className="text-sm text-red-50">
-                  Use a navegação por categorias no topo para explorar o catálogo
-                  ou entre direto na listagem completa.
-                </p>
+              <div className="rounded-2xl bg-white p-5 text-gray-900 shadow-sm sm:col-span-3 lg:col-span-2">
+                <p className="text-sm text-gray-500">Categorias</p>
+                <p className="mt-2 text-3xl font-bold">{totalCategories}</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CATEGORIAS EM DESTAQUE */}
+      {/* CATEGORIAS */}
       {featuredCategories.length > 0 && (
-        <section className="mx-auto max-w-6xl px-6 py-12">
-          <div className="mb-6 flex items-center justify-between">
+        <section className="mx-auto max-w-6xl px-6 py-10">
+          <div className="mb-5 flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">
                 Categorias em destaque
               </h2>
               <p className="mt-1 text-gray-600">
-                Navegue pelas categorias mais importantes da plataforma.
+                Encontre cupons pelas categorias mais buscadas.
               </p>
             </div>
+
+            <Link
+              href="/coupons"
+              className="text-sm font-semibold text-red-600 transition hover:text-red-700"
+            >
+              Explorar categorias
+            </Link>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -155,24 +163,33 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* LOJAS EM DESTAQUE */}
+      {/* LOJAS */}
       {featuredStores.length > 0 && (
         <section className="mx-auto max-w-6xl px-6 py-4">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Lojas em destaque
-            </h2>
-            <p className="mt-1 text-gray-600">
-              Acesse as principais lojas e veja seus cupons disponíveis.
-            </p>
+          <div className="mb-5 flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Lojas em destaque
+              </h2>
+              <p className="mt-1 text-gray-600">
+                Acesse as páginas das lojas e veja os cupons disponíveis.
+              </p>
+            </div>
+
+            <Link
+              href="/coupons"
+              className="text-sm font-semibold text-red-600 transition hover:text-red-700"
+            >
+              Ver cupons
+            </Link>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
             {featuredStores.map((store) => (
               <Link
                 key={store.id}
                 href={`/loja/${store.slug}`}
-                className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
                 <div className="flex h-20 items-center justify-center rounded-xl border border-gray-100 bg-gray-50">
                   {store.logoUrl ? (
@@ -188,27 +205,62 @@ export default async function HomePage() {
                   )}
                 </div>
 
-                <div className="mt-4">
-                  <h3 className="font-semibold text-gray-900">{store.name}</h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Ver página da loja
-                  </p>
-                </div>
+                <p className="mt-3 text-center text-sm font-medium text-gray-800">
+                  {store.name}
+                </p>
               </Link>
             ))}
           </div>
         </section>
       )}
 
+      {/* BANNER */}
+      <section className="mx-auto max-w-6xl px-6 py-10">
+        <div className="overflow-hidden rounded-3xl bg-linear-to-r from-[#0b3b8f] to-[#0d122b] shadow-sm">
+          <div className="grid items-center gap-6 px-8 py-10 lg:grid-cols-2">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wide text-red-300">
+                Seleção especial
+              </p>
+              <h2 className="mt-3 text-4xl font-bold text-white md:text-5xl">
+                Games
+              </h2>
+              <p className="mt-4 max-w-lg text-white/80">
+                Destaque sua campanha promocional, sua categoria premium ou um
+                bloco patrocinado aqui.
+              </p>
+
+              <Link
+                href="/coupons"
+                className="mt-6 inline-flex rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
+              >
+                Explorar ofertas
+              </Link>
+            </div>
+
+            <div className="rounded-2xl bg-white/10 p-6 text-white backdrop-blur">
+              <p className="text-sm text-white/70">Espaço de destaque</p>
+              <p className="mt-2 text-2xl font-bold">
+                Banner promocional da plataforma
+              </p>
+              <p className="mt-3 text-sm text-white/80">
+                Você pode trocar esse bloco por banner dinâmico vindo do banco
+                numa próxima etapa.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CUPONS EM DESTAQUE */}
-      <section className="mx-auto max-w-6xl px-6 py-12">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+      <section className="mx-auto max-w-6xl px-6 py-6">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
               Cupons em destaque
             </h2>
             <p className="mt-1 text-gray-600">
-              Ofertas selecionadas para dar destaque logo na entrada do site.
+              Ofertas selecionadas para aparecer logo na entrada do site.
             </p>
           </div>
 
@@ -224,16 +276,16 @@ export default async function HomePage() {
       </section>
 
       {/* CTA FINAL */}
-      <section className="mx-auto max-w-6xl px-6 pb-14">
-        <div className="rounded-3xl bg-gray-900 px-8 py-10 text-white">
+      <section className="mx-auto max-w-6xl px-6 py-14">
+        <div className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-gray-200">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h2 className="text-2xl font-bold">
-                Quer explorar todas as ofertas?
+              <h2 className="text-2xl font-bold text-gray-900">
+                Explore todas as ofertas da plataforma
               </h2>
-              <p className="mt-2 max-w-2xl text-gray-300">
-                Veja a listagem completa de cupons, filtre por categoria e acesse
-                as páginas individuais das lojas parceiras.
+              <p className="mt-2 max-w-2xl text-gray-600">
+                Navegue por categorias, lojas e cupons em uma experiência de
+                marketplace pronta para crescer.
               </p>
             </div>
 

@@ -27,13 +27,20 @@ export default function Header() {
 
         {/* BUSCA */}
         <form onSubmit={handleSearch} className="hidden flex-1 md:flex">
-          <input
-            type="text"
-            placeholder="Buscar cupons, lojas..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm outline-none focus:border-red-500"
-          />
+        <input
+  type="text"
+  placeholder="Buscar cupons, lojas..."
+  value={search}
+  onChange={(e) => setSearch(e.target.value)}
+  className="
+    w-full rounded-xl border border-gray-300
+    px-4 py-2 text-sm
+    text-gray-800
+    placeholder-gray-600
+    outline-none
+    focus:border-red-500
+  "
+/>
         </form>
 
         {/* NAV */}

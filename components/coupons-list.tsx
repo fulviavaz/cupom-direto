@@ -260,9 +260,7 @@ export default function CouponsList({ coupons }: { coupons: Coupon[] }) {
               </div>
             ) : (
               <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4 text-center">
-                <p className="text-sm text-gray-600">
-                  Esta oferta não possui código. Você será redirecionada para a página da oferta.
-                </p>
+                <p className="text-gray-500">Nenhum cupom encontrado para essa busca.</p>
               </div>
             )}
 

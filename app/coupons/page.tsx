@@ -4,15 +4,19 @@ import CouponsList from '@/components/coupons-list'
 type Props = {
   searchParams: Promise<{
     categoria?: string
+    search?: string
   }>
 }
 
 export default async function CouponsPage({ searchParams }: Props) {
-  const { categoria } = await searchParams
+  const { categoria, search } = await searchParams
+
+  const normalizedSearch = search?.trim() || ''
 
   const coupons = await prisma.coupon.findMany({
     where: {
       isActive: true,
+
       ...(categoria
         ? {
             couponTags: {
@@ -24,6 +28,30 @@ export default async function CouponsPage({ searchParams }: Props) {
                 },
               },
             },
+          }
+        : {}),
+
+      ...(normalizedSearch
+        ? {
+            OR: [
+              {
+                title: {
+                  contains: normalizedSearch,
+                },
+              },
+              {
+                description: {
+                  contains: normalizedSearch,
+                },
+              },
+              {
+                store: {
+                  name: {
+                    contains: normalizedSearch,
+                  },
+                },
+              },
+            ],
           }
         : {}),
     },
@@ -65,6 +93,12 @@ export default async function CouponsPage({ searchParams }: Props) {
               ? `Confira os cupons ativos da categoria ${selectedCategory.name}.`
               : 'Encontre ofertas, descontos e cupons ativos das lojas cadastradas.'}
           </p>
+
+          {normalizedSearch && (
+            <p className="mt-3 text-sm text-gray-500">
+              Resultado da busca por: <span className="font-semibold text-gray-700">"{normalizedSearch}"</span>
+            </p>
+          )}
         </div>
 
         <CouponsList coupons={coupons} />
