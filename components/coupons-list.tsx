@@ -22,6 +22,7 @@ type Coupon = {
   isVerified: boolean
   isActive: boolean
   expiresAt: Date | string | null
+  usesCount: number
   store: {
     id: number
     name: string
@@ -47,28 +48,32 @@ export default function CouponsList({ coupons }: { coupons: Coupon[] }) {
   const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null)
   const [copied, setCopied] = useState(false)
 
-  async function handleCopyAndRedirect() {
-    if (!selectedCoupon) return
+async function handleCopyAndRedirect() {
+  if (!selectedCoupon) return
 
-    try {
-      if (selectedCoupon.code) {
-        await navigator.clipboard.writeText(selectedCoupon.code)
-        setCopied(true)
-      }
+  try {
+    await fetch(`/api/coupons/${selectedCoupon.id}/track`, {
+      method: 'POST',
+    })
 
-      setTimeout(() => {
-        if (selectedCoupon.redirectUrl) {
-          window.open(selectedCoupon.redirectUrl, '_blank')
-        }
-      }, 600)
-    } catch (error) {
-      console.error('Erro ao copiar código:', error)
+    if (selectedCoupon.code) {
+      await navigator.clipboard.writeText(selectedCoupon.code)
+      setCopied(true)
+    }
 
+    setTimeout(() => {
       if (selectedCoupon.redirectUrl) {
         window.open(selectedCoupon.redirectUrl, '_blank')
       }
+    }, 600)
+  } catch (error) {
+    console.error('Erro ao registrar clique/copiar código:', error)
+
+    if (selectedCoupon.redirectUrl) {
+      window.open(selectedCoupon.redirectUrl, '_blank')
     }
   }
+}
 
   function openCouponModal(coupon: Coupon) {
     setSelectedCoupon(coupon)

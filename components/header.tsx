@@ -53,12 +53,7 @@ export default function Header() {
             Cupons
           </Link>
 
-          <Link
-            href="/admin/coupons"
-            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
-          >
-            Admin
-          </Link>
+        
 
         </div>
       </div>

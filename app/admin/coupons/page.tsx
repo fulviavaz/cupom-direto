@@ -25,6 +25,7 @@ type Coupon = {
   redirectUrl: string | null
   imageUrl: string | null
   storeId: number
+  usesCount: number
   store: {
     id: number
     name: string
@@ -582,6 +583,10 @@ const specialTags = tags.filter((tag) => tag.type === 'especial')
                       <p className="text-sm text-gray-500">
                         Tipo: {getCouponTypeLabel(coupon.couponType)}
                       </p>
+
+                      <p className="text-sm text-gray-500">
+  Cliques: {coupon.usesCount}
+</p>
 
                       {coupon.discountText && (
                         <p className="text-sm text-gray-500">
