@@ -1,4 +1,3 @@
-import '../globals.css'
 import type { Metadata } from 'next'
 import CategoriesBar from '@/components/categories-bar'
 import Header from '@/components/header'
@@ -9,19 +8,17 @@ export const metadata: Metadata = {
   description: 'Plataforma de cupons de desconto',
 }
 
-export default function RootLayout({
+export default function PublicLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
-      <body>
-        <TopBanner />
-        <Header />
-        <CategoriesBar />
-        {children}
-      </body>
-    </html>
+    <>
+      <TopBanner />
+      <Header />
+      <CategoriesBar />
+      {children}
+    </>
   )
 }

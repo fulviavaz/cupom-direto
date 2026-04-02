@@ -7,32 +7,20 @@ export default function AdminLayout({
 }) {
   return (
     <div className="flex min-h-screen">
-
-      {/* SIDEBAR */}
-      <aside className="w-64 bg-gray-900 text-white p-6 space-y-4">
-        <h2 className="text-lg font-bold mb-6">Admin</h2>
+      <aside className="w-64 space-y-4 bg-gray-900 p-6 text-white">
+        <h2 className="mb-6 text-lg font-bold">Admin</h2>
 
         <nav className="flex flex-col gap-3 text-sm">
+          <Link href="/admin">Dashboard</Link>
           <Link href="/admin/stores">Lojas</Link>
           <Link href="/admin/tags">Tags</Link>
           <Link href="/admin/coupons">Cupons</Link>
 
-          <a
-            href="/login"
-            onClick={() => {
-              document.cookie = 'auth=false; path=/'
-            }}
-            className="mt-6 text-red-400"
-          >
-            Sair
-          </a>
+        <a href="/login">Sair</a>
         </nav>
       </aside>
 
-      {/* CONTEÚDO */}
-      <main className="flex-1 p-8 bg-gray-50">
-        {children}
-      </main>
+      <main className="flex-1 bg-gray-50 p-8">{children}</main>
     </div>
   )
 }
