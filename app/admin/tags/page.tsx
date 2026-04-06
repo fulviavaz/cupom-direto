@@ -295,59 +295,25 @@ export default function AdminTagsPage() {
                   key={tag.id}
                   className="rounded-xl border border-gray-200 p-4"
                 >
-                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                    <div className="space-y-1">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {tag.name}
-                      </h3>
+                <div className="flex items-center gap-3">
+  {(() => {
+    const Icon = getTagIcon(tag.icon)
+    return (
+      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600">
+        <Icon className="h-5 w-5" />
+      </div>
+    )
+  })()}
 
-                      <p className="text-sm text-gray-500">
-                        Slug: {tag.slug}
-                      </p>
-
-                      <p className="text-sm text-gray-500">
-                        Tipo: {tag.type}
-                      </p>
-
-                      {tag.icon && (
-                        <p className="text-sm text-gray-500">
-                          Ícone: {tag.icon}
-                        </p>
-                      )}
-
-                      <p className="text-sm text-gray-500">
-                        Destaque: {tag.isFeatured ? 'Sim' : 'Não'}
-                      </p>
-                    </div>
-
-                    <div className="flex flex-col items-start gap-3 md:items-end">
-                      <span
-                        className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-medium ${
-                          tag.isActive
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-gray-200 text-gray-700'
-                        }`}
-                      >
-                        {tag.isActive ? 'Ativa' : 'Inativa'}
-                      </span>
-
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEdit(tag)}
-                          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-                        >
-                          Editar
-                        </button>
-
-                        <button
-                          onClick={() => handleDelete(tag.id)}
-                          className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
-                        >
-                          Excluir
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+  <div>
+    <h3 className="text-lg font-semibold text-gray-900">
+      {tag.name}
+    </h3>
+    <p className="text-sm text-gray-500">
+      Slug: {tag.slug}
+    </p>
+  </div>
+</div>
                 </div>
               ))
             )}

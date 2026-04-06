@@ -42,8 +42,8 @@ export async function POST(req: Request) {
     const discountText = body.discountText?.trim() || null
     const discountValue =
       body.discountValue !== '' &&
-      body.discountValue !== null &&
-      body.discountValue !== undefined
+        body.discountValue !== null &&
+        body.discountValue !== undefined
         ? Number(body.discountValue)
         : null
 
@@ -52,16 +52,21 @@ export async function POST(req: Request) {
     const imageUrl = body.imageUrl?.trim() || null
     const storeId = Number(body.storeId)
 
-  const tagIds: number[] = Array.isArray(body.tagIds)
-  ? body.tagIds
-      .map((id: string | number) => Number(id))
-      .filter((id: number) => !isNaN(id))
+    const tagIds: number[] = Array.isArray(body.tagIds)
+      ? body.tagIds
+        .map((id: string | number) => Number(id))
+        .filter((id: number) => !isNaN(id))
       : []
-    
+
     const isFeatured = body.isFeatured ?? false
     const isVerified = body.isVerified ?? false
     const isActive = body.isActive ?? true
     const expiresAt = body.expiresAt ? new Date(body.expiresAt) : null
+
+    const categoryId =
+      body.categoryId !== '' && body.categoryId !== null && body.categoryId !== undefined
+        ? Number(body.categoryId)
+        : null
 
     if (!title) {
       return NextResponse.json(
@@ -95,37 +100,38 @@ export async function POST(req: Request) {
       )
     }
 
-  const coupon = await prisma.coupon.create({
-  data: {
-    title,
-    description,
-    code,
-    rules,
-    discountText,
-    discountValue,
-    couponType,
-    redirectUrl,
-    imageUrl,
-    storeId,
-    isFeatured,
-    isVerified,
-    isActive,
-    expiresAt,
-    couponTags: {
-      create: tagIds.map((tagId: number) => ({
-        tagId,
-      })),
-    },
-  },
-  include: {
-    store: true,
-    couponTags: {
-      include: {
-        tag: true,
+    const coupon = await prisma.coupon.create({
+      data: {
+        title,
+        description,
+        code,
+        rules,
+        discountText,
+        discountValue,
+        couponType,
+        redirectUrl,
+        imageUrl,
+        storeId,
+        isFeatured,
+        isVerified,
+        isActive,
+        expiresAt,
+        categoryId,
+        couponTags: {
+          create: tagIds.map((tagId: number) => ({
+            tagId,
+          })),
+        },
       },
-    },
-  },
-})
+      include: {
+        store: true,
+        couponTags: {
+          include: {
+            tag: true,
+          },
+        },
+      },
+    })
 
     return NextResponse.json(coupon, { status: 201 })
   } catch (error) {

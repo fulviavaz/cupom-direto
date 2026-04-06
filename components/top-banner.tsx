@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
+import { getTagIcon } from '@/lib/tag-icons'
 
 export default async function TopBanner() {
   const categories = await prisma.tag.findMany({
@@ -35,7 +36,10 @@ export default async function TopBanner() {
                 transition hover:bg-white/20
               "
             >
-              <span className="text-base">{cat.icon || '🏷️'}</span>
+            {(() => {
+  const Icon = getTagIcon(cat.icon)
+  return <Icon className="h-4 w-4" />
+})()}
               {cat.name}
             </Link>
           ))}
