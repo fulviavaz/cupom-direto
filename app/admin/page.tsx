@@ -58,12 +58,12 @@ export default async function AdminDashboardPage() {
 
         {/* CARDS PRINCIPAIS */}
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">Total de cupons</p>
-            <p className="mt-3 text-3xl font-bold text-gray-900">
-              {totalCoupons}
-            </p>
-          </div>
+        <div className="rounded-2xl bg-white p-6 shadow-sm border hover:shadow-md transition">
+  <p className="text-sm text-gray-500">Total de cupons</p>
+  <p className="mt-2 text-3xl font-bold text-gray-900">
+    {totalCoupons}
+  </p>
+</div>
 
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <p className="text-sm text-gray-500">Cupons ativos</p>

@@ -1,5 +1,6 @@
 'use client'
 
+import { getTagIcon, TAG_ICON_OPTIONS } from '@/lib/tag-icons'
 import { useEffect, useState } from 'react'
 
 type Tag = {
@@ -180,18 +181,33 @@ export default function AdminTagsPage() {
               />
             </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">
-                Ícone
-              </label>
-              <input
-                type="text"
-                value={icon}
-                onChange={(e) => setIcon(e.target.value)}
-                placeholder="Ex: pizza, home, tag, heart..."
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-black"
-              />
-            </div>
+          <div>
+  <label className="mb-2 block text-sm font-medium text-gray-700">
+    Ícone
+  </label>
+
+  <div className="grid gap-3 md:grid-cols-[1fr_auto]">
+    <select
+      value={icon}
+      onChange={(e) => setIcon(e.target.value)}
+      className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-black"
+    >
+      <option value="">Selecione um ícone</option>
+      {TAG_ICON_OPTIONS.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+
+    <div className="flex items-center justify-center rounded-lg border border-gray-300 px-4">
+      {(() => {
+        const Icon = getTagIcon(icon)
+        return <Icon className="h-5 w-5 text-red-600" />
+      })()}
+    </div>
+  </div>
+</div>
 
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
