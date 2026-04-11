@@ -291,31 +291,58 @@ export default function AdminTagsPage() {
               <p className="text-gray-500">Nenhuma tag cadastrada ainda.</p>
             ) : (
               tags.map((tag) => (
-                <div
-                  key={tag.id}
-                  className="rounded-xl border border-gray-200 p-4"
-                >
-                <div className="flex items-center gap-3">
-  {(() => {
-    const Icon = getTagIcon(tag.icon)
-    return (
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600">
-        <Icon className="h-5 w-5" />
-      </div>
-    )
-  })()}
+  <div
+    key={tag.id}
+    className="rounded-xl border border-gray-200 p-4"
+  >
+    <div className="flex items-center justify-between">
+      
+      {/* ESQUERDA */}
+      <div className="flex items-center gap-3">
+        {(() => {
+          const Icon = getTagIcon(tag.icon)
+          return (
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600">
+              <Icon className="h-5 w-5" />
+            </div>
+          )
+        })()}
 
-  <div>
-    <h3 className="text-lg font-semibold text-gray-900">
-      {tag.name}
-    </h3>
-    <p className="text-sm text-gray-500">
-      Slug: {tag.slug}
-    </p>
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900">
+            {tag.name}
+          </h3>
+
+          <p className="text-sm text-gray-500">
+            Slug: {tag.slug}
+          </p>
+
+          <p className="text-xs text-gray-400">
+            Tipo: {tag.type}
+          </p>
+        </div>
+      </div>
+
+      {/* DIREITA (AQUI ESTAVA FALTANDO) */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => handleEdit(tag)}
+          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+        >
+          Editar
+        </button>
+
+        <button
+          onClick={() => handleDelete(tag.id)}
+          className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
+        >
+          Excluir
+        </button>
+      </div>
+
+    </div>
   </div>
-</div>
-                </div>
-              ))
+))
             )}
           </div>
         </section>

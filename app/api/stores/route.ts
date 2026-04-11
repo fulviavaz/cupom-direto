@@ -4,11 +4,15 @@ import { slugify } from '@/lib/slugify'
 
 export async function GET() {
   try {
-    const stores = await prisma.store.findMany()
+    const stores = await prisma.store.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
 
     return NextResponse.json(stores)
   } catch (error) {
-    console.error('ERRO REAL AO BUSCAR LOJAS:', error)
+    console.error('Erro ao buscar lojas:', error)
 
     return NextResponse.json(
       {
@@ -27,6 +31,10 @@ export async function POST(req: Request) {
     const name = body.name?.trim()
     const logoUrl = body.logoUrl?.trim() || null
     const affiliateUrl = body.affiliateUrl?.trim() || null
+    const description = body.description?.trim() || null
+    const websiteUrl = body.websiteUrl?.trim() || null
+    const isFeatured = Boolean(body.isFeatured)
+    const isActive = body.isActive ?? true
 
     if (!name) {
       return NextResponse.json(
@@ -43,8 +51,8 @@ export async function POST(req: Request) {
 
     if (existingStore) {
       return NextResponse.json(
-        { error: 'Já existe uma loja com esse nome' },
-        { status: 409 }
+        { error: 'Já existe uma loja com esse nome/slug' },
+        { status: 400 }
       )
     }
 
@@ -54,13 +62,16 @@ export async function POST(req: Request) {
         slug,
         logoUrl,
         affiliateUrl,
-        isActive: true,
+        description,
+        websiteUrl,
+        isFeatured,
+        isActive,
       },
     })
 
     return NextResponse.json(store, { status: 201 })
   } catch (error) {
-    console.error('ERRO REAL AO CRIAR LOJA:', error)
+    console.error('Erro ao criar loja:', error)
 
     return NextResponse.json(
       {

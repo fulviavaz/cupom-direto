@@ -2,10 +2,13 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { slugify } from '@/lib/slugify'
 
-export async function PUT(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+type Context = {
+  params: Promise<{
+    id: string
+  }>
+}
+
+export async function PUT(req: Request, context: Context) {
   try {
     const { id } = await context.params
     const storeId = Number(id)
@@ -19,6 +22,9 @@ export async function PUT(
     const name = body.name?.trim()
     const logoUrl = body.logoUrl?.trim() || null
     const affiliateUrl = body.affiliateUrl?.trim() || null
+    const description = body.description?.trim() || null
+    const websiteUrl = body.websiteUrl?.trim() || null
+    const isFeatured = Boolean(body.isFeatured)
     const isActive = body.isActive ?? true
 
     if (!name) {
@@ -41,7 +47,7 @@ export async function PUT(
 
     const slug = slugify(name)
 
-    const duplicatedStore = await prisma.store.findFirst({
+    const storeWithSameSlug = await prisma.store.findFirst({
       where: {
         slug,
         NOT: {
@@ -50,10 +56,10 @@ export async function PUT(
       },
     })
 
-    if (duplicatedStore) {
+    if (storeWithSameSlug) {
       return NextResponse.json(
-        { error: 'Já existe outra loja com esse nome' },
-        { status: 409 }
+        { error: 'Já existe outra loja com esse nome/slug' },
+        { status: 400 }
       )
     }
 
@@ -64,17 +70,20 @@ export async function PUT(
         slug,
         logoUrl,
         affiliateUrl,
+        description,
+        websiteUrl,
+        isFeatured,
         isActive,
       },
     })
 
     return NextResponse.json(updatedStore)
   } catch (error) {
-    console.error('ERRO AO EDITAR LOJA:', error)
+    console.error('Erro ao atualizar loja:', error)
 
     return NextResponse.json(
       {
-        error: 'Erro ao editar loja',
+        error: 'Erro ao atualizar loja',
         details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
@@ -82,10 +91,7 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  _: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(_: Request, context: Context) {
   try {
     const { id } = await context.params
     const storeId = Number(id)
@@ -109,11 +115,9 @@ export async function DELETE(
       where: { id: storeId },
     })
 
-    return NextResponse.json({
-      message: 'Loja excluída com sucesso',
-    })
+    return NextResponse.json({ message: 'Loja excluída com sucesso' })
   } catch (error) {
-    console.error('ERRO AO EXCLUIR LOJA:', error)
+    console.error('Erro ao excluir loja:', error)
 
     return NextResponse.json(
       {

@@ -8,6 +8,9 @@ type Store = {
   slug: string
   logoUrl: string | null
   affiliateUrl: string | null
+  description?: string | null
+  websiteUrl?: string | null
+  isFeatured?: boolean
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -16,11 +19,18 @@ type Store = {
 export default function AdminStoresPage() {
   const [stores, setStores] = useState<Store[]>([])
   const [name, setName] = useState('')
-  const [logoUrl, setLogoUrl] = useState('')
   const [affiliateUrl, setAffiliateUrl] = useState('')
+  const [description, setDescription] = useState('')
+  const [websiteUrl, setWebsiteUrl] = useState('')
+  const [isFeatured, setIsFeatured] = useState(false)
   const [isActive, setIsActive] = useState(true)
+
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [currentLogoUrl, setCurrentLogoUrl] = useState('')
+
   const [editingId, setEditingId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [message, setMessage] = useState('')
 
   async function loadStores() {
@@ -43,9 +53,13 @@ export default function AdminStoresPage() {
   function handleEdit(store: Store) {
     setEditingId(store.id)
     setName(store.name)
-    setLogoUrl(store.logoUrl || '')
     setAffiliateUrl(store.affiliateUrl || '')
+    setDescription(store.description || '')
+    setWebsiteUrl(store.websiteUrl || '')
+    setIsFeatured(store.isFeatured ?? false)
     setIsActive(store.isActive)
+    setCurrentLogoUrl(store.logoUrl || '')
+    setLogoFile(null)
     setMessage('')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -53,9 +67,13 @@ export default function AdminStoresPage() {
   function handleCancelEdit() {
     setEditingId(null)
     setName('')
-    setLogoUrl('')
     setAffiliateUrl('')
+    setDescription('')
+    setWebsiteUrl('')
+    setIsFeatured(false)
     setIsActive(true)
+    setLogoFile(null)
+    setCurrentLogoUrl('')
     setMessage('')
   }
 
@@ -95,6 +113,32 @@ export default function AdminStoresPage() {
     setMessage('')
 
     try {
+      let logoUrl = currentLogoUrl || ''
+
+      if (logoFile) {
+        setUploading(true)
+
+        const formData = new FormData()
+        formData.append('file', logoFile)
+
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        })
+
+        const uploadData = await uploadRes.json()
+
+        if (!uploadRes.ok) {
+          setMessage(uploadData.error || 'Erro ao fazer upload da imagem')
+          setLoading(false)
+          setUploading(false)
+          return
+        }
+
+        logoUrl = uploadData.secure_url
+        setUploading(false)
+      }
+
       const url = editingId ? `/api/stores/${editingId}` : '/api/stores'
       const method = editingId ? 'PUT' : 'POST'
 
@@ -107,6 +151,9 @@ export default function AdminStoresPage() {
           name,
           logoUrl,
           affiliateUrl,
+          description,
+          websiteUrl,
+          isFeatured,
           isActive,
         }),
       })
@@ -127,9 +174,13 @@ export default function AdminStoresPage() {
 
       setEditingId(null)
       setName('')
-      setLogoUrl('')
       setAffiliateUrl('')
+      setDescription('')
+      setWebsiteUrl('')
+      setIsFeatured(false)
       setIsActive(true)
+      setLogoFile(null)
+      setCurrentLogoUrl('')
 
       await loadStores()
     } catch (error) {
@@ -137,6 +188,7 @@ export default function AdminStoresPage() {
       setMessage('Erro ao salvar loja')
     } finally {
       setLoading(false)
+      setUploading(false)
     }
   }
 
@@ -150,7 +202,7 @@ export default function AdminStoresPage() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Admin - Lojas</h1>
           <p className="mt-2 text-gray-600">
-            Cadastre e gerencie as lojas parceiras do portal.
+            Cadastre e gerencie as lojas parceiras da plataforma.
           </p>
         </div>
 
@@ -176,15 +228,35 @@ export default function AdminStoresPage() {
 
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">
-                URL da logo
+                Logo da loja
               </label>
+
               <input
-                type="text"
-                value={logoUrl}
-                onChange={(e) => setLogoUrl(e.target.value)}
-                placeholder="https://exemplo.com/logo.png"
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-black"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files?.[0]) {
+                    setLogoFile(e.target.files[0])
+                  }
+                }}
+                className="block w-full text-sm text-gray-700"
               />
+
+              {logoFile && (
+                <img
+                  src={URL.createObjectURL(logoFile)}
+                  alt="Preview da logo"
+                  className="mt-3 h-16 rounded-lg border border-gray-200 bg-white object-contain p-2"
+                />
+              )}
+
+              {!logoFile && currentLogoUrl && (
+                <img
+                  src={currentLogoUrl}
+                  alt="Logo atual"
+                  className="mt-3 h-16 rounded-lg border border-gray-200 bg-white object-contain p-2"
+                />
+              )}
             </div>
 
             <div>
@@ -198,6 +270,46 @@ export default function AdminStoresPage() {
                 placeholder="https://www.loja.com.br"
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-black"
               />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Descrição
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Breve descrição da loja"
+                rows={3}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-black"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Website
+              </label>
+              <input
+                type="text"
+                value={websiteUrl}
+                onChange={(e) => setWebsiteUrl(e.target.value)}
+                placeholder="https://www.loja.com"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-black"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Destaque
+              </label>
+              <select
+                value={isFeatured ? 'sim' : 'nao'}
+                onChange={(e) => setIsFeatured(e.target.value === 'sim')}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-black"
+              >
+                <option value="nao">Não</option>
+                <option value="sim">Sim</option>
+              </select>
             </div>
 
             <div>
@@ -217,10 +329,16 @@ export default function AdminStoresPage() {
             <div className="flex gap-3">
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || uploading}
                 className="rounded-lg bg-black px-5 py-3 text-white transition hover:opacity-90 disabled:opacity-50"
               >
-                {loading ? 'Salvando...' : editingId ? 'Atualizar loja' : 'Salvar loja'}
+                {uploading
+                  ? 'Enviando logo...'
+                  : loading
+                  ? 'Salvando...'
+                  : editingId
+                  ? 'Atualizar loja'
+                  : 'Salvar loja'}
               </button>
 
               {editingId && (
@@ -253,38 +371,69 @@ export default function AdminStoresPage() {
                   className="rounded-xl border border-gray-200 p-4"
                 >
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                    <div className="space-y-1">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {store.name}
-                      </h3>
+                    <div className="flex gap-4">
+                    <div className="flex h-16 w-20 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-white">
+  {store.logoUrl ? (
+    <img
+      src={store.logoUrl}
+      alt={store.name}
+      className="h-full w-full object-contain p-2"
+      onError={(e) => {
+        e.currentTarget.style.display = 'none'
+      }}
+    />
+  ) : (
+    <span className="px-2 text-center text-xs text-gray-400">Sem logo</span>
+  )}
+</div>
 
-                      <p className="text-sm text-gray-500">
-                        Slug: {store.slug}
-                      </p>
+                      <div className="space-y-1">
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {store.name}
+                        </h3>
 
-                      {store.logoUrl && (
-                        <p className="break-all text-sm text-gray-500">
-                          Logo: {store.logoUrl}
+                        <p className="text-sm text-gray-500">
+                          Slug: {store.slug}
                         </p>
-                      )}
 
-                      {store.affiliateUrl && (
-                        <p className="break-all text-sm text-gray-500">
-                          Afiliado: {store.affiliateUrl}
-                        </p>
-                      )}
+                        {store.websiteUrl && (
+                          <p className="break-all text-sm text-gray-500">
+                            Site: {store.websiteUrl}
+                          </p>
+                        )}
+
+                        {store.affiliateUrl && (
+                          <p className="break-all text-sm text-gray-500">
+                            Afiliado: {store.affiliateUrl}
+                          </p>
+                        )}
+
+                        {store.description && (
+                          <p className="text-sm text-gray-500">
+                            {store.description}
+                          </p>
+                        )}
+                      </div>
                     </div>
 
                     <div className="flex flex-col items-start gap-3 md:items-end">
-                      <span
-                        className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-medium ${
-                          store.isActive
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-gray-200 text-gray-700'
-                        }`}
-                      >
-                        {store.isActive ? 'Ativa' : 'Inativa'}
-                      </span>
+                      <div className="flex gap-2">
+                        <span
+                          className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-medium ${
+                            store.isActive
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-gray-200 text-gray-700'
+                          }`}
+                        >
+                          {store.isActive ? 'Ativa' : 'Inativa'}
+                        </span>
+
+                        {(store.isFeatured ?? false) && (
+                          <span className="inline-flex w-fit rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700">
+                            Destaque
+                          </span>
+                        )}
+                      </div>
 
                       <div className="flex gap-2">
                         <button

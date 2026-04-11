@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import CouponsList from '@/components/coupons-list'
+import HomeSearch from '@/components/home-search'
 
 export default async function HomePage() {
   // 🔥 Cupons em destaque
@@ -54,6 +55,7 @@ export default async function HomePage() {
           <p className="mt-2 text-white/80">
             Economize em lojas, restaurantes, tecnologia e muito mais
           </p>
+          <HomeSearch />
         </div>
       </section>
 
