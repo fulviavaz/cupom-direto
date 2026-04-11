@@ -1,4 +1,6 @@
+import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
+import CouponsChart from '@/components/admin/coupons-chart'
 
 export default async function AdminDashboardPage() {
   const totalCoupons = await prisma.coupon.count()
@@ -9,7 +11,15 @@ export default async function AdminDashboardPage() {
     },
   })
 
+  const inactiveCoupons = await prisma.coupon.count({
+    where: {
+      isActive: false,
+    },
+  })
+
   const totalStores = await prisma.store.count()
+
+  const totalTags = await prisma.tag.count()
 
   const totalClicksResult = await prisma.coupon.aggregate({
     _sum: {
@@ -25,9 +35,18 @@ export default async function AdminDashboardPage() {
     },
     include: {
       store: true,
+      category: true,
     },
     take: 5,
   })
+
+  const chartData = topCoupons.map((coupon) => ({
+    title:
+      coupon.title.length > 20
+        ? coupon.title.slice(0, 20) + '...'
+        : coupon.title,
+    clicks: coupon.usesCount,
+  }))
 
   const stores = await prisma.store.findMany({
     include: {
@@ -49,42 +68,90 @@ export default async function AdminDashboardPage() {
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-7xl space-y-8 p-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-2 text-gray-600">
-            Visão geral da performance da plataforma.
-          </p>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="mt-2 text-gray-600">
+              Visão geral da performance da plataforma.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/admin/stores"
+              className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+            >
+              Gerenciar lojas
+            </Link>
+
+            <Link
+              href="/admin/tags"
+              className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+            >
+              Gerenciar tags
+            </Link>
+
+            <Link
+              href="/admin/coupons"
+              className="rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
+            >
+              Gerenciar cupons
+            </Link>
+          </div>
         </div>
 
         {/* CARDS PRINCIPAIS */}
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-2xl bg-white p-6 shadow-sm border hover:shadow-md transition">
-  <p className="text-sm text-gray-500">Total de cupons</p>
-  <p className="mt-2 text-3xl font-bold text-gray-900">
-    {totalCoupons}
-  </p>
-</div>
-
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <p className="text-sm text-gray-500">Cupons ativos</p>
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+            <p className="text-sm text-gray-500">Total de cupons</p>
             <p className="mt-3 text-3xl font-bold text-gray-900">
+              {totalCoupons}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+            <p className="text-sm text-gray-500">Cupons ativos</p>
+            <p className="mt-3 text-3xl font-bold text-green-600">
               {activeCoupons}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+            <p className="text-sm text-gray-500">Cupons inativos</p>
+            <p className="mt-3 text-3xl font-bold text-gray-700">
+              {inactiveCoupons}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md">
             <p className="text-sm text-gray-500">Lojas cadastradas</p>
             <p className="mt-3 text-3xl font-bold text-gray-900">
               {totalStores}
             </p>
           </div>
 
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+            <p className="text-sm text-gray-500">Tags cadastradas</p>
+            <p className="mt-3 text-3xl font-bold text-gray-900">
+              {totalTags}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md">
             <p className="text-sm text-gray-500">Total de cliques</p>
             <p className="mt-3 text-3xl font-bold text-red-600">
               {totalClicks}
             </p>
           </div>
+        </section>
+
+        {/* GRÁFICO */}
+        <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <h2 className="mb-4 text-xl font-semibold text-gray-900">
+            📊 Cliques por cupom
+          </h2>
+
+          <CouponsChart data={chartData} />
         </section>
 
         <section className="grid gap-6 xl:grid-cols-2">
@@ -111,15 +178,18 @@ export default async function AdminDashboardPage() {
                     className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 p-4"
                   >
                     <div>
-                      <p className="text-sm text-gray-400">
-                        #{index + 1}
-                      </p>
+                      <p className="text-sm text-gray-400">#{index + 1}</p>
                       <h3 className="font-semibold text-gray-900">
                         {coupon.title}
                       </h3>
                       <p className="text-sm text-gray-500">
                         Loja: {coupon.store.name}
                       </p>
+                      {coupon.category && (
+                        <p className="text-xs text-gray-400">
+                          Categoria: {coupon.category.name}
+                        </p>
+                      )}
                     </div>
 
                     <div className="text-right">
@@ -157,9 +227,7 @@ export default async function AdminDashboardPage() {
                     className="flex items-center justify-between rounded-xl border border-gray-100 bg-gray-50 p-4"
                   >
                     <div>
-                      <p className="text-sm text-gray-400">
-                        #{index + 1}
-                      </p>
+                      <p className="text-sm text-gray-400">#{index + 1}</p>
                       <h3 className="font-semibold text-gray-900">
                         {store.name}
                       </h3>
