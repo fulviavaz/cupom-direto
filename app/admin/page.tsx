@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import CouponsChart from '@/components/admin/coupons-chart'
+import ClicksChart from '@/components/admin/clicks-chart'
 
 export default async function AdminDashboardPage() {
   const totalCoupons = await prisma.coupon.count()
@@ -64,6 +65,36 @@ export default async function AdminDashboardPage() {
     }))
     .sort((a, b) => b.clicks - a.clicks)
     .slice(0, 5)
+  
+  const last7Days = await prisma.clickEvent.findMany({
+  where: {
+    createdAt: {
+      gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+    },
+  },
+  orderBy: {
+    createdAt: 'asc',
+  },
+  })
+  
+  const clicksByDayMap: Record<string, number> = {}
+
+last7Days.forEach((click) => {
+  const date = click.createdAt.toISOString().split('T')[0]
+
+  if (!clicksByDayMap[date]) {
+    clicksByDayMap[date] = 0
+  }
+
+  clicksByDayMap[date] += 1
+})
+
+const clicksChartData = Object.entries(clicksByDayMap).map(
+  ([date, clicks]) => ({
+    date,
+    clicks,
+  })
+)
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -153,6 +184,14 @@ export default async function AdminDashboardPage() {
 
           <CouponsChart data={chartData} />
         </section>
+
+        <section className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+  <h2 className="mb-4 text-xl font-semibold text-gray-900">
+    📈 Cliques nos últimos 7 dias
+  </h2>
+
+  <ClicksChart data={clicksChartData} />
+</section>
 
         <section className="grid gap-6 xl:grid-cols-2">
           {/* TOP CUPONS */}

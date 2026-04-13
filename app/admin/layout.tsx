@@ -1,6 +1,5 @@
-import LogoutButton from '@/components/logout-button'
 import Link from 'next/link'
-
+import LogoutButton from '@/components/logout-button'
 
 export default function AdminLayout({
   children,
@@ -9,12 +8,10 @@ export default function AdminLayout({
 }) {
   return (
     <div className="flex min-h-screen bg-gray-100">
-      
-      {/* SIDEBAR */}
-      <aside className="w-64 bg-gray-900 text-white flex flex-col p-6">
-        <h2 className="text-xl font-bold mb-8">Cupom Admin</h2>
+      <aside className="flex min-h-screen w-64 flex-col bg-gray-900 p-6 text-white">
+        <h2 className="mb-8 text-xl font-bold">Cupom Admin</h2>
 
-        <nav className="flex flex-col gap-3 text-sm">
+        <nav className="flex flex-col gap-4 text-sm">
           <Link href="/admin" className="hover:text-red-400">
             Dashboard
           </Link>
@@ -32,30 +29,21 @@ export default function AdminLayout({
           </Link>
         </nav>
 
-        <div className="mt-auto">
+        <div className="mt-auto pt-8">
           <LogoutButton />
         </div>
       </aside>
 
-      {/* CONTEÚDO */}
-      <div className="flex-1 flex flex-col">
-
-        {/* HEADER */}
-        <header className="bg-white border-b px-8 py-4 flex justify-between items-center">
+      <div className="flex flex-1 flex-col">
+        <header className="flex items-center justify-between border-b bg-white px-8 py-4">
           <h1 className="text-lg font-semibold text-gray-900">
             Painel administrativo
           </h1>
 
-          <span className="text-sm text-gray-500">
-            Bem-vinda 👋
-          </span>
+          <span className="text-sm text-gray-500">Bem-vinda 👋</span>
         </header>
 
-        {/* PAGE */}
-        <main className="p-8">
-          {children}
-        </main>
-
+        <main className="p-8">{children}</main>
       </div>
     </div>
   )

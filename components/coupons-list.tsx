@@ -52,8 +52,14 @@ async function handleCopyAndRedirect() {
   if (!selectedCoupon) return
 
   try {
-    await fetch(`/api/coupons/${selectedCoupon.id}/track`, {
+    await fetch('/api/coupons/click', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        couponId: selectedCoupon.id,
+      }),
     })
 
     if (selectedCoupon.code) {
@@ -61,16 +67,14 @@ async function handleCopyAndRedirect() {
       setCopied(true)
     }
 
-    setTimeout(() => {
-      if (selectedCoupon.redirectUrl) {
-        window.open(selectedCoupon.redirectUrl, '_blank')
-      }
-    }, 600)
+    if (selectedCoupon.redirectUrl) {
+      window.open(selectedCoupon.redirectUrl, '_blank', 'noopener,noreferrer')
+    }
   } catch (error) {
     console.error('Erro ao registrar clique/copiar código:', error)
 
     if (selectedCoupon.redirectUrl) {
-      window.open(selectedCoupon.redirectUrl, '_blank')
+      window.open(selectedCoupon.redirectUrl, '_blank', 'noopener,noreferrer')
     }
   }
 }

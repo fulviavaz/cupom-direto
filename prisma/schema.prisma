@@ -68,6 +68,8 @@ model Coupon {
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  
+  clicks ClickEvent[]
 }
 
 model CouponTag {
@@ -90,4 +92,11 @@ enum TagType {
 enum CouponType {
   coupon
   offer
+}
+
+model ClickEvent {
+  id        Int      @id @default(autoincrement())
+  couponId  Int
+  coupon    Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
