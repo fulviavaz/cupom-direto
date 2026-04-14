@@ -6,6 +6,7 @@ export async function GET() {
     const coupons = await prisma.coupon.findMany({
       include: {
         store: true,
+        category: true,
         couponTags: {
           include: {
             tag: true,
@@ -40,6 +41,7 @@ export async function POST(req: Request) {
     const code = body.code?.trim() || null
     const rules = body.rules?.trim() || null
     const discountText = body.discountText?.trim() || null
+
     const discountValue =
       body.discountValue !== '' &&
         body.discountValue !== null &&
@@ -50,7 +52,15 @@ export async function POST(req: Request) {
     const couponType = body.couponType
     const redirectUrl = body.redirectUrl?.trim() || null
     const imageUrl = body.imageUrl?.trim() || null
+
     const storeId = Number(body.storeId)
+
+    const categoryId =
+      body.categoryId !== '' &&
+        body.categoryId !== null &&
+        body.categoryId !== undefined
+        ? Number(body.categoryId)
+        : null
 
     const tagIds: number[] = Array.isArray(body.tagIds)
       ? body.tagIds
@@ -62,11 +72,6 @@ export async function POST(req: Request) {
     const isVerified = body.isVerified ?? false
     const isActive = body.isActive ?? true
     const expiresAt = body.expiresAt ? new Date(body.expiresAt) : null
-
-    const categoryId =
-      body.categoryId !== '' && body.categoryId !== null && body.categoryId !== undefined
-        ? Number(body.categoryId)
-        : null
 
     if (!title) {
       return NextResponse.json(
@@ -89,6 +94,13 @@ export async function POST(req: Request) {
       )
     }
 
+    if (categoryId === null || isNaN(categoryId)) {
+      return NextResponse.json(
+        { error: 'Categoria é obrigatória' },
+        { status: 400 }
+      )
+    }
+
     const store = await prisma.store.findUnique({
       where: { id: storeId },
     })
@@ -97,6 +109,24 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { error: 'Loja não encontrada' },
         { status: 404 }
+      )
+    }
+
+    const category = await prisma.tag.findUnique({
+      where: { id: categoryId },
+    })
+
+    if (!category) {
+      return NextResponse.json(
+        { error: 'Categoria não encontrada' },
+        { status: 404 }
+      )
+    }
+
+    if (category.type !== 'categoria') {
+      return NextResponse.json(
+        { error: 'A categoria selecionada é inválida' },
+        { status: 400 }
       )
     }
 
@@ -112,11 +142,11 @@ export async function POST(req: Request) {
         redirectUrl,
         imageUrl,
         storeId,
+        categoryId,
         isFeatured,
         isVerified,
         isActive,
         expiresAt,
-        categoryId,
         couponTags: {
           create: tagIds.map((tagId: number) => ({
             tagId,
@@ -125,6 +155,7 @@ export async function POST(req: Request) {
       },
       include: {
         store: true,
+        category: true,
         couponTags: {
           include: {
             tag: true,

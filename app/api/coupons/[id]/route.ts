@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-export async function PUT(
-  req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+type Context = {
+  params: Promise<{
+    id: string
+  }>
+}
+
+export async function PUT(req: Request, context: Context) {
   try {
     const { id } = await context.params
     const couponId = Number(id)
@@ -20,20 +23,39 @@ export async function PUT(
     const code = body.code?.trim() || null
     const rules = body.rules?.trim() || null
     const discountText = body.discountText?.trim() || null
+
     const discountValue =
-      body.discountValue !== '' && body.discountValue !== null && body.discountValue !== undefined
+      body.discountValue !== '' &&
+        body.discountValue !== null &&
+        body.discountValue !== undefined
         ? Number(body.discountValue)
         : null
+
     const couponType = body.couponType
     const redirectUrl = body.redirectUrl?.trim() || null
     const imageUrl = body.imageUrl?.trim() || null
+
     const storeId = Number(body.storeId)
-    const tagIds: number[] = Array.isArray(body.tagIds) ? body.tagIds : []
+
+    const categoryId =
+      body.categoryId !== '' &&
+        body.categoryId !== null &&
+        body.categoryId !== undefined
+        ? Number(body.categoryId)
+        : null
+
+    const tagIds: number[] = Array.isArray(body.tagIds)
+      ? body.tagIds
+        .map((id: string | number) => Number(id))
+        .filter((id: number) => !isNaN(id))
+      : []
+
     const isFeatured = body.isFeatured ?? false
     const isVerified = body.isVerified ?? false
     const isActive = body.isActive ?? true
     const expiresAt = body.expiresAt ? new Date(body.expiresAt) : null
 
+    // validações
     if (!title) {
       return NextResponse.json(
         { error: 'Título é obrigatório' },
@@ -55,6 +77,13 @@ export async function PUT(
       )
     }
 
+    if (categoryId === null || isNaN(categoryId)) {
+      return NextResponse.json(
+        { error: 'Categoria é obrigatória' },
+        { status: 400 }
+      )
+    }
+
     const existingCoupon = await prisma.coupon.findUnique({
       where: { id: couponId },
     })
@@ -66,6 +95,31 @@ export async function PUT(
       )
     }
 
+    // valida loja
+    const store = await prisma.store.findUnique({
+      where: { id: storeId },
+    })
+
+    if (!store) {
+      return NextResponse.json(
+        { error: 'Loja não encontrada' },
+        { status: 404 }
+      )
+    }
+
+    // valida categoria
+    const category = await prisma.tag.findUnique({
+      where: { id: categoryId },
+    })
+
+    if (!category || category.type !== 'categoria') {
+      return NextResponse.json(
+        { error: 'Categoria inválida' },
+        { status: 400 }
+      )
+    }
+
+    // update + reset de tags
     const updatedCoupon = await prisma.coupon.update({
       where: { id: couponId },
       data: {
@@ -79,21 +133,23 @@ export async function PUT(
         redirectUrl,
         imageUrl,
         storeId,
+        categoryId,
         isFeatured,
         isVerified,
         isActive,
         expiresAt,
+
+        // 👇 remove antigas e recria
         couponTags: {
           deleteMany: {},
-          create: tagIds.map((tagId) => ({
-            tag: {
-              connect: { id: tagId },
-            },
+          create: tagIds.map((tagId: number) => ({
+            tagId,
           })),
         },
       },
       include: {
         store: true,
+        category: true,
         couponTags: {
           include: {
             tag: true,
@@ -104,11 +160,11 @@ export async function PUT(
 
     return NextResponse.json(updatedCoupon)
   } catch (error) {
-    console.error('Erro ao editar cupom:', error)
+    console.error('Erro ao atualizar cupom:', error)
 
     return NextResponse.json(
       {
-        error: 'Erro ao editar cupom',
+        error: 'Erro ao atualizar cupom',
         details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
@@ -116,10 +172,7 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  _: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(_: Request, context: Context) {
   try {
     const { id } = await context.params
     const couponId = Number(id)
