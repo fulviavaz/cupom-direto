@@ -5,7 +5,7 @@ export default function SiteFooter() {
         <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_auto]">
           {/* COLUNA 1 */}
           <div>
-            <h3 className="text-[15px] font-black uppercase text-[#ef233c]">
+            <h3 className="text-[16px] font-title uppercase tracking-wide text-[#ef233c]">
               Sobre Cupom Direto
             </h3>
 
@@ -17,7 +17,7 @@ export default function SiteFooter() {
 
           {/* COLUNA 2 */}
           <div>
-            <h3 className="text-[15px] font-black uppercase text-[#ef233c]">
+            <h3 className="text-[16px] font-title uppercase tracking-wide text-[#ef233c]">
               Datas especiais
             </h3>
 
@@ -35,7 +35,7 @@ export default function SiteFooter() {
 
           {/* COLUNA 3 */}
           <div>
-            <h3 className="text-[15px] font-black uppercase text-[#ef233c]">
+            <h3 className="text-[16px] font-title uppercase tracking-wide text-[#ef233c]">
               Navegação
             </h3>
 

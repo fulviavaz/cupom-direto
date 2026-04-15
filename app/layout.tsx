@@ -1,4 +1,5 @@
 import './globals.css'
+import { montserrat, specialGothic } from './fonts'
 
 export default function RootLayout({
   children,
@@ -7,7 +8,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body>{children}</body>
+      <body className={`${montserrat.variable} ${specialGothic.variable}`}>
+        {children}
+      </body>
     </html>
   )
 }

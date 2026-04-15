@@ -1,5 +1,3 @@
-import React from 'react'
-
 export default function TopBanner() {
   return (
     <div className="w-full bg-[#5d0c96]">

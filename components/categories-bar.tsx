@@ -1,6 +1,3 @@
-
-
-
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { getTagIcon } from '@/lib/tag-icons'
@@ -29,12 +26,15 @@ export default async function CategoriesBar({ currentCategory }: Props) {
         <div className="flex items-stretch justify-between gap-2 overflow-x-auto py-3">
           {categories.map((cat) => {
             const Icon = getTagIcon(cat.icon)
+            const isActive = currentCategory === cat.slug
 
             return (
               <Link
                 key={cat.id}
                 href={`/coupons?categoria=${cat.slug}`}
-                className="flex min-w-[88px] flex-col items-center justify-center gap-2 rounded-[10px] px-2 py-2 text-center text-white transition hover:bg-white/10"
+                className={`flex min-w-[88px] flex-col items-center justify-center gap-2 rounded-[10px] px-2 py-2 text-center transition ${
+                  isActive ? 'bg-white/15 text-white' : 'text-white hover:bg-white/10'
+                }`}
               >
                 <Icon className="h-5 w-5" />
                 <span className="text-[9px] font-semibold uppercase leading-[1.1] tracking-wide">

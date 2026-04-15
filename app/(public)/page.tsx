@@ -57,6 +57,7 @@ export default async function HomePage() {
   })
 
   const specialSection = specialTags[0] ?? null
+
   const specialCoupons =
     specialSection?.couponTags
       .map((ct) => ct.coupon)
@@ -107,19 +108,20 @@ export default async function HomePage() {
       <div className="mx-auto max-w-[1180px] px-4 pt-10">
         {/* BLOCO PRINCIPAL */}
         <section className="mb-10">
-          <div className="grid items-center gap-6 md:grid-cols-[280px_1fr]">
-            <div className="flex items-center justify-center md:justify-start">
+          <div className="grid items-start gap-8 md:grid-cols-[260px_1fr]">
+            <div className="flex items-start justify-center pt-[6px] md:justify-start">
               <img
                 src="/logo-cupom-direto.png"
                 alt="Cupom Direto"
-                className="h-auto w-[230px] object-contain"
+                className="h-auto w-[250px] object-contain"
               />
             </div>
 
             <div>
-              <h1 className="mb-5 text-center text-[22px] font-black uppercase tracking-tight text-[#111] md:text-left md:text-[26px]">
+              <h1 className="font-title mb-5 text-center text-[34px] uppercase leading-none tracking-tight text-[#111] md:text-left">
                 Conectando você com os melhores cupons!
               </h1>
+
               <HomeSearch />
             </div>
           </div>
@@ -128,7 +130,7 @@ export default async function HomePage() {
         {/* LOJAS EM DESTAQUE */}
         <section className="mb-10">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-[18px] font-black uppercase tracking-tight text-[#ef233c]">
+            <h2 className="font-title text-[22px] uppercase leading-none text-[#ef233c]">
               Lojas em destaque
             </h2>
 
@@ -143,7 +145,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
             {featuredStores.map((store) => (
               <a key={store.id} href={`/loja/${store.slug}`} className="group">
-                <div className="rounded-[14px]">
+                <div>
                   <div className="flex h-[74px] items-center justify-center overflow-hidden rounded-[12px] bg-white px-3 shadow-sm ring-1 ring-black/5 transition group-hover:shadow-md">
                     {store.logoUrl ? (
                       <img
@@ -173,7 +175,7 @@ export default async function HomePage() {
         {/* CUPONS EM DESTAQUE */}
         <section className="mb-10">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-[18px] font-black uppercase tracking-tight text-[#ef233c]">
+            <h2 className="font-title text-[22px] uppercase leading-none text-[#ef233c]">
               Cupons em destaque
             </h2>
 
@@ -209,17 +211,17 @@ export default async function HomePage() {
 
         {/* BUSCA FINAL */}
         <section className="mb-8">
-          <div className="grid items-center gap-6 md:grid-cols-[280px_1fr]">
-            <div className="flex items-center justify-center md:justify-start">
+          <div className="grid items-start gap-8 md:grid-cols-[260px_1fr]">
+            <div className="flex items-start justify-center pt-[6px] md:justify-start">
               <img
                 src="/logo-cupom-direto.png"
                 alt="Cupom Direto"
-                className="h-auto w-[230px] object-contain"
+                className="h-auto w-[250px] object-contain"
               />
             </div>
 
             <div>
-              <h2 className="mb-5 text-center text-[22px] font-black uppercase tracking-tight text-[#111] md:text-left md:text-[26px]">
+              <h2 className="font-title mb-5 text-center text-[34px] uppercase leading-none tracking-tight text-[#111] md:text-left">
                 Conectando você com os melhores cupons!
               </h2>
               <HomeSearch />
