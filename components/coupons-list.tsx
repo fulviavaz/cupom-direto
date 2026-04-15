@@ -44,40 +44,46 @@ function getCouponTypeLabel(type: 'coupon' | 'offer') {
   }
 }
 
-export default function CouponsList({ coupons }: { coupons: Coupon[] }) {
+export default function CouponsList({
+  coupons,
+  compact = false,
+}: {
+  coupons: Coupon[]
+  compact?: boolean
+}) {
   const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null)
   const [copied, setCopied] = useState(false)
 
-async function handleCopyAndRedirect() {
-  if (!selectedCoupon) return
+  async function handleCopyAndRedirect() {
+    if (!selectedCoupon) return
 
-  try {
-    await fetch('/api/coupons/click', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        couponId: selectedCoupon.id,
-      }),
-    })
+    try {
+      await fetch('/api/coupons/click', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          couponId: selectedCoupon.id,
+        }),
+      })
 
-    if (selectedCoupon.code) {
-      await navigator.clipboard.writeText(selectedCoupon.code)
-      setCopied(true)
-    }
+      if (selectedCoupon.code) {
+        await navigator.clipboard.writeText(selectedCoupon.code)
+        setCopied(true)
+      }
 
-    if (selectedCoupon.redirectUrl) {
-      window.open(selectedCoupon.redirectUrl, '_blank', 'noopener,noreferrer')
-    }
-  } catch (error) {
-    console.error('Erro ao registrar clique/copiar código:', error)
+      if (selectedCoupon.redirectUrl) {
+        window.open(selectedCoupon.redirectUrl, '_blank', 'noopener,noreferrer')
+      }
+    } catch (error) {
+      console.error('Erro ao registrar clique/copiar código:', error)
 
-    if (selectedCoupon.redirectUrl) {
-      window.open(selectedCoupon.redirectUrl, '_blank', 'noopener,noreferrer')
+      if (selectedCoupon.redirectUrl) {
+        window.open(selectedCoupon.redirectUrl, '_blank', 'noopener,noreferrer')
+      }
     }
   }
-}
 
   function openCouponModal(coupon: Coupon) {
     setSelectedCoupon(coupon)
@@ -89,205 +95,127 @@ async function handleCopyAndRedirect() {
     setCopied(false)
   }
 
+  if (coupons.length === 0) {
+    return (
+      <div className="rounded-[18px] bg-white p-10 text-center shadow-sm ring-1 ring-black/5">
+        <p className="text-sm text-[#666]">Nenhum cupom disponível.</p>
+      </div>
+    )
+  }
+
   return (
     <>
-      {coupons.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center">
-          <p className="text-gray-500">Nenhum cupom disponível.</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {coupons.map((coupon) => (
+      <div className="space-y-4">
+        {coupons.map((coupon) => (
           <article
-  key={coupon.id}
-  className="group rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md"
->
-  <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            key={coupon.id}
+            className="rounded-[16px] bg-[#f8f8f8] px-4 py-4 shadow-sm ring-1 ring-black/5"
+          >
+            <div className="grid items-center gap-4 md:grid-cols-[110px_1fr_auto_92px]">
+              {/* LOGO */}
+              <div className="flex h-[58px] items-center justify-center overflow-hidden rounded-[10px] bg-white px-3">
+                {coupon.store.logoUrl ? (
+                  <img
+                    src={coupon.store.logoUrl}
+                    alt={coupon.store.name}
+                    className="max-h-[36px] w-auto max-w-full object-contain"
+                  />
+                ) : (
+                  <span className="text-[11px] font-semibold text-[#444]">
+                    {coupon.store.name}
+                  </span>
+                )}
+              </div>
 
-    {/* ESQUERDA */}
-    <div className="flex flex-1 gap-4">
+              {/* CONTEÚDO */}
+              <div className="min-w-0">
+                <h3 className="truncate text-[16px] font-extrabold uppercase leading-tight text-[#111]">
+                  {coupon.title}
+                </h3>
 
-      {/* LOGO */}
-      <div className="flex h-20 w-24 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white">
-        {coupon.store.logoUrl ? (
-          <img
-            src={coupon.store.logoUrl}
-            alt={coupon.store.name}
-            className="h-12 w-16 object-contain"
-          />
-        ) : (
-          <span className="px-2 text-center text-xs font-medium text-gray-400">
-            {coupon.store.name}
-          </span>
-        )}
+                <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#444]">
+                  <span>Validade 00/00</span>
+                  <span>0000 cupons disponíveis</span>
+                  <span>{getCouponTypeLabel(coupon.couponType)}</span>
+                  {coupon.isVerified && <span>Verificado</span>}
+                </div>
+              </div>
+
+              {/* CTA */}
+              <div className="flex justify-start md:justify-center">
+                <button
+                  onClick={() => openCouponModal(coupon)}
+                  className="min-w-[114px] rounded-[12px] bg-[#06b6b2] px-4 py-3 text-[13px] font-extrabold uppercase leading-tight text-white transition hover:opacity-90"
+                >
+                  Resgatar
+                  <br />
+                  cupom
+                </button>
+              </div>
+
+              {/* DESCONTO */}
+              <div className="text-left md:text-right">
+                <p className="text-[20px] font-black leading-none text-[#111] md:text-[28px]">
+                  {coupon.discountValue !== null ? `${coupon.discountValue}%` : '—'}
+                </p>
+                <p className="mt-1 text-[11px] font-bold uppercase leading-none text-[#111]">
+                  de desconto
+                </p>
+              </div>
+            </div>
+          </article>
+        ))}
       </div>
-
-      {/* TEXTO */}
-      <div className="flex-1 space-y-2">
-
-        {/* BADGES */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700">
-            {getCouponTypeLabel(coupon.couponType)}
-          </span>
-
-          {coupon.isVerified && (
-            <span className="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
-              Verificado
-            </span>
-          )}
-
-          {coupon.isFeatured && (
-            <span className="rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-700">
-              Destaque
-            </span>
-          )}
-        </div>
-
-        {/* TÍTULO */}
-        <h2 className="text-lg font-semibold text-gray-900 group-hover:text-red-600 transition">
-          {coupon.title}
-        </h2>
-
-        {/* LOJA */}
-        <p className="text-sm text-gray-500">
-          {coupon.store.name}
-        </p>
-
-        {/* DESCRIÇÃO */}
-        {coupon.description && (
-          <p className="text-sm text-gray-600 line-clamp-2">
-            {coupon.description}
-          </p>
-        )}
-
-        {/* TAGS */}
-        <div className="flex flex-wrap gap-2 pt-1">
-          {coupon.couponTags.length > 0 ? (
-            coupon.couponTags.map((item) => (
-              <span
-                key={item.tag.id}
-                className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700"
-              >
-                {item.tag.name}
-              </span>
-            ))
-          ) : (
-            <span className="text-sm text-gray-400">
-              Sem tags
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
-
-    {/* DIREITA */}
-    <div className="flex flex-col items-start gap-3 lg:items-end">
-
-      {/* DESCONTO (MAIS FORTE) */}
-      <div className="text-left lg:text-right">
-        {coupon.discountText && (
-          <p className="text-sm font-medium text-gray-500">
-            {coupon.discountText}
-          </p>
-        )}
-
-        {coupon.discountValue !== null && (
-          <div className="inline-block rounded-lg bg-green-100 px-3 py-1">
-            <p className="text-xl font-bold text-green-700">
-              {coupon.discountValue}%
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* CÓDIGO */}
-      {coupon.code && (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-2 text-sm font-semibold text-gray-700">
-          {coupon.code}
-        </div>
-      )}
-
-      {/* BOTÃO (CTA FORTE) */}
-      <button
-        onClick={() => openCouponModal(coupon)}
-        className="
-          w-full lg:w-auto
-          rounded-lg
-          bg-red-600
-          px-5 py-3
-          text-sm font-semibold text-white
-          transition
-          hover:bg-red-700
-        "
-      >
-        Ver {getCouponTypeLabel(coupon.couponType)}
-      </button>
-    </div>
-
-  </div>
-</article>
-          ))}
-        </div>
-      )}
 
       {selectedCoupon && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="w-full max-w-[520px] rounded-[20px] bg-white p-6 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm text-gray-500">
-                  {selectedCoupon.store.name}
-                </p>
-                <h3 className="text-xl font-bold text-gray-900">
+                <p className="text-sm text-[#666]">{selectedCoupon.store.name}</p>
+                <h3 className="mt-1 text-[24px] font-extrabold uppercase leading-tight text-[#111]">
                   {selectedCoupon.title}
                 </h3>
               </div>
 
               <button
                 onClick={closeCouponModal}
-                className="text-sm text-gray-500 hover:text-gray-800"
+                className="text-sm font-semibold text-[#666] hover:text-[#111]"
               >
                 Fechar
               </button>
             </div>
 
-            {selectedCoupon.description && (
-              <p className="mt-4 text-sm text-gray-600">
-                {selectedCoupon.description}
-              </p>
-            )}
-
             {selectedCoupon.code ? (
-              <div className="mt-6 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-4 text-center">
-                <p className="text-xs uppercase tracking-wide text-gray-500">
+              <div className="mt-6 rounded-[16px] border border-dashed border-[#d7d7d7] bg-[#fafafa] p-5 text-center">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-[#777]">
                   Código do cupom
                 </p>
-                <p className="mt-2 text-2xl font-bold text-gray-900">
+                <p className="mt-2 text-[28px] font-black uppercase text-[#111]">
                   {selectedCoupon.code}
                 </p>
               </div>
             ) : (
-              <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4 text-center">
-                <p className="text-gray-500">Nenhum cupom encontrado para essa busca.</p>
+              <div className="mt-6 rounded-[16px] bg-[#fafafa] p-5 text-center">
+                <p className="text-sm text-[#666]">
+                  Essa oferta não possui código. Clique abaixo para acessar.
+                </p>
               </div>
             )}
 
             {selectedCoupon.rules && (
-              <div className="mt-4 rounded-xl bg-gray-50 p-4">
-                <p className="text-xs uppercase tracking-wide text-gray-500">
+              <div className="mt-4 rounded-[16px] bg-[#f6f6f6] p-4">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-[#777]">
                   Regras
                 </p>
-                <p className="mt-2 text-sm text-gray-700">
-                  {selectedCoupon.rules}
-                </p>
+                <p className="mt-2 text-sm text-[#444]">{selectedCoupon.rules}</p>
               </div>
             )}
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <button
                 onClick={handleCopyAndRedirect}
-                className="flex-1 rounded-lg bg-green-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-green-700"
+                className="flex-1 rounded-[12px] bg-[#06b6b2] px-5 py-3 text-sm font-bold uppercase text-white transition hover:opacity-90"
               >
                 {selectedCoupon.code
                   ? copied
@@ -298,7 +226,7 @@ async function handleCopyAndRedirect() {
 
               <button
                 onClick={closeCouponModal}
-                className="rounded-lg border border-gray-300 px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                className="rounded-[12px] border border-[#d5d5d5] px-5 py-3 text-sm font-semibold text-[#444] transition hover:bg-[#f3f3f3]"
               >
                 Cancelar
               </button>

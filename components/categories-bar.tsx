@@ -1,3 +1,6 @@
+
+
+
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { getTagIcon } from '@/lib/tag-icons'
@@ -15,54 +18,41 @@ export default async function CategoriesBar({ currentCategory }: Props) {
     orderBy: {
       name: 'asc',
     },
+    take: 10,
   })
 
   if (!categories.length) return null
 
   return (
-    <div className="w-full bg-red-600 py-3">
-      <div className="mx-auto max-w-6xl px-4">
-        <div className="flex gap-3 overflow-x-auto">
+    <div className="w-full bg-[#ef233c]">
+      <div className="mx-auto max-w-[1180px] px-4">
+        <div className="flex items-stretch justify-between gap-2 overflow-x-auto py-3">
+          {categories.map((cat) => {
+            const Icon = getTagIcon(cat.icon)
 
-          {/* Todas */}
+            return (
+              <Link
+                key={cat.id}
+                href={`/coupons?categoria=${cat.slug}`}
+                className="flex min-w-[88px] flex-col items-center justify-center gap-2 rounded-[10px] px-2 py-2 text-center text-white transition hover:bg-white/10"
+              >
+                <Icon className="h-5 w-5" />
+                <span className="text-[9px] font-semibold uppercase leading-[1.1] tracking-wide">
+                  {cat.name}
+                </span>
+              </Link>
+            )
+          })}
+
           <Link
             href="/coupons"
-            className={`
-              whitespace-nowrap rounded-xl px-4 py-2 text-sm font-medium transition
-              ${!currentCategory
-                ? 'bg-white text-red-600'
-                : 'bg-white/10 text-white hover:bg-white hover:text-red-600'}
-            `}
+            className="flex min-w-[88px] flex-col items-center justify-center gap-2 rounded-[10px] px-2 py-2 text-center text-white transition hover:bg-white/10"
           >
-            Todas
+            <span className="text-[18px] font-bold leading-none">+</span>
+            <span className="text-[9px] font-semibold uppercase leading-[1.1] tracking-wide">
+              Ver todas
+            </span>
           </Link>
-
-        {categories.map((cat) => {
-  const isActive = currentCategory === cat.slug
-
-  return (
-    <Link
-      key={cat.id}
-      href={`/coupons?categoria=${cat.slug}`}
-      className={`
-        whitespace-nowrap rounded-xl px-4 py-2 text-sm font-medium transition
-        ${isActive
-          ? 'bg-white text-red-600'
-          : 'bg-white/10 text-white hover:bg-white hover:text-red-600'}
-      `}
-    >
-      <div className="flex items-center gap-2">
-        {(() => {
-          const Icon = getTagIcon(cat.icon)
-          return <Icon className="h-4 w-4" />
-        })()}
-
-        <span>{cat.name}</span>
-      </div>
-    </Link>
-  )
-})}
-
         </div>
       </div>
     </div>

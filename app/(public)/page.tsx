@@ -3,7 +3,17 @@ import CouponsList from '@/components/coupons-list'
 import HomeSearch from '@/components/home-search'
 
 export default async function HomePage() {
-  // 🔥 Cupons em destaque
+  const featuredStores = await prisma.store.findMany({
+    where: {
+      isActive: true,
+      isFeatured: true,
+    },
+    orderBy: {
+      updatedAt: 'desc',
+    },
+    take: 6,
+  })
+
   const featuredCoupons = await prisma.coupon.findMany({
     where: {
       isActive: true,
@@ -13,13 +23,14 @@ export default async function HomePage() {
       store: true,
       category: true,
       couponTags: {
-        include: { tag: true },
+        include: {
+          tag: true,
+        },
       },
     },
-    take: 8,
+    take: 6,
   })
 
-  // 🔥 Seleções especiais
   const specialTags = await prisma.tag.findMany({
     where: {
       type: 'especial',
@@ -33,63 +44,222 @@ export default async function HomePage() {
               store: true,
               category: true,
               couponTags: {
-                include: { tag: true },
+                include: {
+                  tag: true,
+                },
               },
             },
           },
         },
       },
     },
+    take: 1,
+  })
+
+  const specialSection = specialTags[0] ?? null
+  const specialCoupons =
+    specialSection?.couponTags
+      .map((ct) => ct.coupon)
+      .filter((coupon) => coupon.isActive)
+      .slice(0, 6) ?? []
+
+  const extraCoupons = await prisma.coupon.findMany({
+    where: {
+      isActive: true,
+      isFeatured: false,
+    },
+    include: {
+      store: true,
+      category: true,
+      couponTags: {
+        include: {
+          tag: true,
+        },
+      },
+    },
+    take: 6,
+  })
+
+  const totalCoupons = await prisma.coupon.count({
+    where: { isActive: true },
+  })
+
+  const totalStores = await prisma.store.count({
+    where: { isActive: true },
+  })
+
+  const totalCategories = await prisma.tag.count({
+    where: {
+      type: 'categoria',
+      isActive: true,
+    },
+  })
+
+  const totalSpecials = await prisma.tag.count({
+    where: {
+      type: 'especial',
+      isActive: true,
+    },
   })
 
   return (
-    <main className="bg-gray-50">
+    <main className="bg-[#f3f3f3]">
+      <div className="mx-auto max-w-[1180px] px-4 pt-10">
+        {/* BLOCO PRINCIPAL */}
+        <section className="mb-10">
+          <div className="grid items-center gap-6 md:grid-cols-[280px_1fr]">
+            <div className="flex items-center justify-center md:justify-start">
+              <img
+                src="/logo-cupom-direto.png"
+                alt="Cupom Direto"
+                className="h-auto w-[230px] object-contain"
+              />
+            </div>
 
-      {/* HERO */}
-      <section className="bg-red-600 py-12 text-white">
-        <div className="mx-auto max-w-6xl px-6 text-center">
-          <h1 className="text-3xl font-bold">
-            Encontre os melhores cupons e ofertas
-          </h1>
+            <div>
+              <h1 className="mb-5 text-center text-[22px] font-black uppercase tracking-tight text-[#111] md:text-left md:text-[26px]">
+                Conectando você com os melhores cupons!
+              </h1>
+              <HomeSearch />
+            </div>
+          </div>
+        </section>
 
-          <p className="mt-2 text-white/80">
-            Economize em lojas, restaurantes, tecnologia e muito mais
-          </p>
-          <HomeSearch />
-        </div>
-      </section>
-
-      {/* CONTEÚDO */}
-      <div className="mx-auto max-w-6xl px-6 py-10">
-
-        {/* 🔥 Destaques */}
-        {featuredCoupons.length > 0 && (
-          <section className="mb-12">
-            <h2 className="mb-4 text-xl font-bold text-gray-900">
-              🔥 Cupons em destaque
+        {/* LOJAS EM DESTAQUE */}
+        <section className="mb-10">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-[18px] font-black uppercase tracking-tight text-[#ef233c]">
+              Lojas em destaque
             </h2>
 
-            <CouponsList coupons={featuredCoupons} />
-          </section>
-        )}
+            <a
+              href="/lojas"
+              className="text-[12px] font-bold uppercase text-[#222] hover:text-[#ef233c]"
+            >
+              Ver todas
+            </a>
+          </div>
 
-        {/* 🚀 Seleções especiais */}
-        {specialTags.map((tag) => {
-          const coupons = tag.couponTags.map((ct) => ct.coupon)
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+            {featuredStores.map((store) => (
+              <a key={store.id} href={`/loja/${store.slug}`} className="group">
+                <div className="rounded-[14px]">
+                  <div className="flex h-[74px] items-center justify-center overflow-hidden rounded-[12px] bg-white px-3 shadow-sm ring-1 ring-black/5 transition group-hover:shadow-md">
+                    {store.logoUrl ? (
+                      <img
+                        src={store.logoUrl}
+                        alt={store.name}
+                        className="max-h-[44px] w-auto max-w-full object-contain"
+                      />
+                    ) : (
+                      <span className="text-sm font-semibold text-[#444]">
+                        {store.name}
+                      </span>
+                    )}
+                  </div>
 
-          if (!coupons.length) return null
+                  <div className="px-1 pt-2">
+                    <p className="truncate text-[12px] font-medium text-[#444]">
+                      {store.name}
+                    </p>
+                    <p className="text-[11px] text-[#06b6b2]">0000 cupons</p>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
 
-          return (
-            <section key={tag.id} className="mb-12">
-              <h2 className="mb-4 text-xl font-bold text-gray-900">
-                {tag.name}
+        {/* CUPONS EM DESTAQUE */}
+        <section className="mb-10">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-[18px] font-black uppercase tracking-tight text-[#ef233c]">
+              Cupons em destaque
+            </h2>
+
+            <a
+              href="/coupons"
+              className="text-[12px] font-bold uppercase text-[#222] hover:text-[#ef233c]"
+            >
+              Buscar mais cupons
+            </a>
+          </div>
+
+          <CouponsList coupons={featuredCoupons} compact />
+        </section>
+
+        {/* BANNER ESPECIAL */}
+        <section className="mb-10">
+          <div className="overflow-hidden rounded-[18px] shadow-sm ring-1 ring-black/5">
+            <img
+              src="/banner-special.jpg"
+              alt={specialSection?.name || 'Seleção especial'}
+              className="h-auto w-full object-cover"
+            />
+          </div>
+        </section>
+
+        {/* MAIS CUPONS */}
+        <section className="mb-12">
+          <CouponsList
+            coupons={specialCoupons.length > 0 ? specialCoupons : extraCoupons}
+            compact
+          />
+        </section>
+
+        {/* BUSCA FINAL */}
+        <section className="mb-8">
+          <div className="grid items-center gap-6 md:grid-cols-[280px_1fr]">
+            <div className="flex items-center justify-center md:justify-start">
+              <img
+                src="/logo-cupom-direto.png"
+                alt="Cupom Direto"
+                className="h-auto w-[230px] object-contain"
+              />
+            </div>
+
+            <div>
+              <h2 className="mb-5 text-center text-[22px] font-black uppercase tracking-tight text-[#111] md:text-left md:text-[26px]">
+                Conectando você com os melhores cupons!
               </h2>
+              <HomeSearch />
+            </div>
+          </div>
+        </section>
 
-              <CouponsList coupons={coupons} />
-            </section>
-          )
-        })}
+        {/* NÚMEROS */}
+        <section className="mb-16">
+          <div className="grid grid-cols-2 gap-3 rounded-[18px] bg-[#ececec] p-5 shadow-sm md:grid-cols-5">
+            <div className="text-center">
+              <p className="text-[28px] font-black text-[#ef233c]">{totalCoupons}</p>
+              <p className="text-[11px] uppercase tracking-wide text-[#333]">Cupons</p>
+            </div>
 
+            <div className="text-center">
+              <p className="text-[28px] font-black text-[#ef233c]">
+                {featuredCoupons.length}
+              </p>
+              <p className="text-[11px] uppercase tracking-wide text-[#333]">Promoções</p>
+            </div>
+
+            <div className="text-center">
+              <p className="text-[28px] font-black text-[#ef233c]">{totalStores}</p>
+              <p className="text-[11px] uppercase tracking-wide text-[#333]">Lojas</p>
+            </div>
+
+            <div className="text-center">
+              <p className="text-[28px] font-black text-[#ef233c]">{totalCategories}</p>
+              <p className="text-[11px] uppercase tracking-wide text-[#333]">Categorias</p>
+            </div>
+
+            <div className="text-center">
+              <p className="text-[28px] font-black text-[#ef233c]">{totalSpecials}</p>
+              <p className="text-[11px] uppercase tracking-wide text-[#333]">
+                Datas especiais
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
     </main>
   )

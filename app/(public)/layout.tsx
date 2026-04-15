@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import CategoriesBar from '@/components/categories-bar'
-import Header from '@/components/header'
+import SiteFooter from '@/components/site-footer'
 import TopBanner from '@/components/top-banner'
 
 export const metadata: Metadata = {
@@ -16,9 +16,9 @@ export default function PublicLayout({
   return (
     <>
       <TopBanner />
-      <Header />
       <CategoriesBar />
       {children}
+      <SiteFooter />
     </>
   )
 }
