@@ -6,18 +6,33 @@ import { useRouter } from 'next/navigation'
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
   const router = useRouter()
 
-  function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
+    setError('')
 
-    if (email === 'admin@cupom.com' && password === '123456') {
-      document.cookie = 'auth=true; path=/'
-      router.push('/admin')
-    } else {
-      alert('Credenciais inválidas')
-    }
+    const res = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email,
+      password,
+    }),
+  })
+
+  const data = await res.json()
+
+  if (!res.ok) {
+    setError(data.error)
+    return
   }
+
+  router.push('/admin')
+}
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-50">
@@ -28,6 +43,12 @@ export default function LoginPage() {
         <h1 className="text-xl font-bold mb-6 text-center">
           Login Admin
         </h1>
+
+        {error && (
+          <div className="mb-4 text-sm text-red-500 text-center">
+            {error}
+          </div>
+        )}
 
         <input
           type="email"

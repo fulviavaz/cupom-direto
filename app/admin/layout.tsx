@@ -1,11 +1,16 @@
 import Link from 'next/link'
 import LogoutButton from '@/components/logout-button'
+import { cookies } from 'next/headers'
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const cookieStore = await cookies()
+  const sessionCookie = cookieStore.get('session')
+  const user = sessionCookie ? JSON.parse(sessionCookie.value) : null
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       <aside className="flex min-h-screen w-64 flex-col bg-gray-900 p-6 text-white">
@@ -27,6 +32,10 @@ export default function AdminLayout({
           <Link href="/admin/coupons" className="hover:text-red-400">
             Cupons
           </Link>
+
+        {user?.role === 'admin' && (
+  <Link href="/admin/users">Usuários</Link>
+)}
         </nav>
 
         <div className="mt-auto pt-8">
