@@ -15,6 +15,19 @@ body {
   font-family: var(--font-montserrat), sans-serif;
 }
 
+body {
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
 .font-title {
   font-family: var(--font-special-gothic), sans-serif;
 }

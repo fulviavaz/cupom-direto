@@ -24,22 +24,21 @@ export default function HomeSearch() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Buscar Cupons, Lojas, Categorias ou Produtos"
-          className="h-[54px] w-full rounded-[14px] bg-[#e9e9e9] px-5 text-[13px] text-[#222] placeholder:text-[#666] outline-none"
+          className="h-[58px] w-full rounded-[18px] bg-[#ececec] px-9 text-[16px] font-medium text-[#333] placeholder:text-[#666] outline-none"
         />
-
-        <button
-          type="submit"
-          className="flex h-[54px] min-w-[150px] items-center justify-center gap-2 rounded-[14px] border border-[#ddd] bg-white px-6 text-[13px] font-extrabold uppercase text-[#ef233c] transition hover:opacity-90"
-        >
-          Buscar
-          <Search className="h-4 w-4" />
-        </button>
+<button
+  type="submit"
+  className="font-title flex h-[58px] min-w-[178px] items-center justify-center gap-2 rounded-[18px] bg-[#ececec] px-8 text-[26px] uppercase leading-none text-[#ef233c] border border-[#dcdcdc] transition hover:opacity-90"
+>
+  <span className="translate-y-[1px]">Buscar</span>
+  <Search className="h-[26px] w-[26px]" strokeWidth={2.2} />
+</button>
       </div>
     </form>
   )

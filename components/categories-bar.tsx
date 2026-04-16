@@ -15,15 +15,15 @@ export default async function CategoriesBar({ currentCategory }: Props) {
     orderBy: {
       name: 'asc',
     },
-    take: 10,
+    take: 11,
   })
 
   if (!categories.length) return null
 
   return (
-    <div className="w-full bg-[#ef233c]">
-      <div className="mx-auto max-w-[1180px] px-4">
-        <div className="flex items-stretch justify-between gap-2 overflow-x-auto py-3">
+    <div className="w-full bg-[#ef0f23]">
+      <div className="mx-auto max-w-[1440px] px-6">
+        <div className="flex items-stretch justify-between gap-2 overflow-x-auto py-5">
           {categories.map((cat) => {
             const Icon = getTagIcon(cat.icon)
             const isActive = currentCategory === cat.slug
@@ -32,12 +32,16 @@ export default async function CategoriesBar({ currentCategory }: Props) {
               <Link
                 key={cat.id}
                 href={`/coupons?categoria=${cat.slug}`}
-                className={`flex min-w-[88px] flex-col items-center justify-center gap-2 rounded-[10px] px-2 py-2 text-center transition ${
-                  isActive ? 'bg-white/15 text-white' : 'text-white hover:bg-white/10'
+                className={`group flex min-w-[96px] flex-col items-center justify-center gap-[8px] rounded-[8px] px-2 py-1 text-center transition ${
+                  isActive ? 'bg-white/10' : 'hover:bg-white/10'
                 }`}
               >
-                <Icon className="h-5 w-5" />
-                <span className="text-[9px] font-semibold uppercase leading-[1.1] tracking-wide">
+                <Icon
+                  className="h-[34px] w-[34px] text-white"
+                  strokeWidth={1.3}
+                />
+
+                <span className="text-[12px] font-normal uppercase leading-[1.05] tracking-[0.02em] text-white">
                   {cat.name}
                 </span>
               </Link>
@@ -46,10 +50,13 @@ export default async function CategoriesBar({ currentCategory }: Props) {
 
           <Link
             href="/coupons"
-            className="flex min-w-[88px] flex-col items-center justify-center gap-2 rounded-[10px] px-2 py-2 text-center text-white transition hover:bg-white/10"
+            className="group flex min-w-[96px] flex-col items-center justify-center gap-[8px] rounded-[8px] px-2 py-1 text-center transition hover:bg-white/10"
           >
-            <span className="text-[18px] font-bold leading-none">+</span>
-            <span className="text-[9px] font-semibold uppercase leading-[1.1] tracking-wide">
+            <span className="flex h-[35px] w-[35px] items-center justify-center rounded-full bg-white text-[35px] font-medium leading-none text-[#ef0f23]">
+              +
+            </span>
+
+            <span className="text-[12px] font-normal uppercase leading-[1.05] tracking-[0.02em] text-white">
               Ver todas
             </span>
           </Link>
