@@ -9,6 +9,10 @@ import {
   Tag,
   Smartphone,
   UtensilsCrossed,
+  GraduationCap,   // educação
+  Banknote,        // financeiro
+  Wrench,          // ferramentas
+  Dumbbell,        // esportes / academia
 } from 'lucide-react'
 
 export const TAG_ICON_OPTIONS = [
@@ -21,6 +25,13 @@ export const TAG_ICON_OPTIONS = [
   { value: 'home', label: 'Casa' },
   { value: 'smartphone', label: 'Tecnologia' },
   { value: 'utensils', label: 'Alimentação' },
+
+  // 🔥 NOVOS
+  { value: 'education', label: 'Educação' },
+  { value: 'finance', label: 'Financeiro' },
+  { value: 'tools', label: 'Ferramentas' },
+  { value: 'fitness', label: 'Esportes / Academia' },
+
   { value: 'tag', label: 'Padrão' },
 ] as const
 
@@ -44,6 +55,17 @@ export function getTagIcon(icon?: string | null) {
       return Smartphone
     case 'utensils':
       return UtensilsCrossed
+
+    // 🔥 NOVOS
+    case 'education':
+      return GraduationCap
+    case 'finance':
+      return Banknote
+    case 'tools':
+      return Wrench
+    case 'fitness':
+      return Dumbbell
+
     case 'tag':
     default:
       return Tag

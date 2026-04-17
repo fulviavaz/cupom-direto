@@ -42,9 +42,9 @@ export default function CouponsList({
           key={coupon.id}
           className="rounded-[18px] bg-[#f1f1f1] px-5 py-3 shadow-sm ring-1 ring-black/10"
         >
-          <div className="grid items-center gap-4 md:grid-cols-[128px_1fr_112px_78px]">
+          <div className="grid items-center gap-4 md:grid-cols-[150px_1fr_118px_92px]">
             {/* LOGO */}
-            <div className="flex h-[62px] w-[118px] items-center justify-center overflow-hidden rounded-[12px]">
+            <div className="flex h-[70px] w-[150px] items-center justify-center overflow-hidden rounded-[16px]">
               {coupon.store.logoUrl ? (
                 <img
                   src={coupon.store.logoUrl}
@@ -52,19 +52,19 @@ export default function CouponsList({
                   className="h-full w-full object-contain"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center rounded-[12px] bg-[#ececec] text-xs font-semibold text-[#444]">
+                <div className="flex h-full w-full items-center justify-center rounded-[16px] bg-[#ececec] text-xs font-semibold text-[#444]">
                   {coupon.store.name}
                 </div>
               )}
             </div>
 
-            {/* INFO */}
+            {/* CONTEÚDO */}
             <div className="min-w-0">
-              <h3 className="font-title truncate text-[18px] uppercase leading-none text-[#111]">
+              <h3 className="font-title truncate text-[20px] uppercase leading-none tracking-tight text-[#111]">
                 {coupon.title}
               </h3>
 
-              <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-medium text-[#4a4a4a]">
+              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] font-medium text-[#3f3f3f]">
                 <span className="inline-flex items-center gap-1">
                   <CalendarDays className="h-[10px] w-[10px]" />
                   Validade 00/00
@@ -77,11 +77,11 @@ export default function CouponsList({
 
                 <span className="inline-flex items-center gap-1">
                   <BadgePercent className="h-[10px] w-[10px]" />
-                  {coupon.couponType === 'coupon' ? 'Cupom' : 'Promoção'}
+                  Cupom/Promoção
                 </span>
 
                 {coupon.isVerified && (
-                  <span className="inline-flex items-center gap-1 text-[#07b8b3]">
+                  <span className="inline-flex items-center gap-1 text-[#11b6b3]">
                     <CircleCheck className="h-[10px] w-[10px]" />
                     Verificado
                   </span>
@@ -89,11 +89,11 @@ export default function CouponsList({
               </div>
             </div>
 
-            {/* BOTÃO */}
+            {/* CTA */}
             <div className="flex justify-start md:justify-center">
               <button
                 onClick={() => openCoupon(coupon)}
-                className="font-title flex h-[60px] w-[94px] items-center justify-center rounded-[14px] bg-[#18b7b4] px-3 text-center text-[15px] uppercase leading-[0.9] text-white transition hover:opacity-90"
+                className="font-title flex h-[78px] w-[108px] items-center justify-center rounded-[16px] bg-[#19b8b5] px-3 text-center text-[23px] uppercase leading-[0.88] text-white transition hover:opacity-90"
               >
                 <span>
                   Resgatar
@@ -104,11 +104,11 @@ export default function CouponsList({
             </div>
 
             {/* DESCONTO */}
-            <div className="text-left md:text-right">
-              <p className="font-title text-[30px] leading-none text-[#111]">
+            <div className="text-center">
+              <p className="font-title text-[34px] leading-none tracking-tight text-[#111]">
                 {coupon.discountValue ? `${coupon.discountValue}%` : '—'}
               </p>
-              <p className="mt-[2px] text-[9px] font-black uppercase leading-none tracking-tight text-[#111]">
+              <p className="font-title mt-[2px] text-[16px] uppercase leading-none tracking-tight text-[#111]">
                 de desconto
               </p>
             </div>
