@@ -35,3 +35,22 @@ a {
 .font-body {
   font-family: var(--font-montserrat), sans-serif;
 }
+
+@keyframes scrollStores {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.carousel-track {
+  width: max-content;
+  animation: scrollStores 30s linear infinite;
+}
+
+.carousel-track:hover {
+  animation-play-state: paused;
+}

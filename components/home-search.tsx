@@ -36,7 +36,7 @@ export default function HomeSearch() {
   type="submit"
   className="font-title flex h-[58px] min-w-[178px] items-center justify-center gap-2 rounded-[18px] bg-[#ececec] px-8 text-[26px] uppercase leading-none text-[#ef233c] border border-[#dcdcdc] transition hover:opacity-90"
 >
-  <span className="translate-y-[1px]">Buscar</span>
+  <span className="translate-y-px">Buscar</span>
   <Search className="h-[26px] w-[26px]" strokeWidth={2.2} />
 </button>
       </div>

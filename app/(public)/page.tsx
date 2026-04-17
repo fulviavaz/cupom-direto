@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import CouponsList from '@/components/coupons-list'
 import HomeSearch from '@/components/home-search'
+import FeaturedStoresCarousel from '@/components/featured-stores-carousel'
 
 export default async function HomePage() {
   const featuredStores = await prisma.store.findMany({
@@ -146,36 +147,7 @@ export default async function HomePage() {
   </div>
 
   <div className="overflow-x-auto pb-2">
-    <div className="flex min-w-max gap-6">
-      {featuredStores.map((store) => (
-        <a
-          key={store.id}
-          href={`/loja/${store.slug}`}
-          className="w-[170px] shrink-0"
-        >
-          <div className="flex h-[72px] items-center justify-center overflow-hidden rounded-[16px]">
-            {store.logoUrl ? (
-              <img
-                src={store.logoUrl}
-                alt={store.name}
-                className="h-full w-full object-contain"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center rounded-[16px] bg-[#ececec] text-sm font-semibold text-[#444]">
-                {store.name}
-              </div>
-            )}
-          </div>
-
-          <div className="pt-2">
-            <p className="truncate text-[11px] font-medium text-[#222]">
-              {store.name}
-            </p>
-            <p className="text-[10px] text-[#08b8b3]">0000 cupons</p>
-          </div>
-        </a>
-      ))}
-    </div>
+  <FeaturedStoresCarousel stores={featuredStores} />
   </div>
 </section>
 
