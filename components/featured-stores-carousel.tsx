@@ -5,6 +5,9 @@ type Store = {
   name: string
   slug: string
   logoUrl: string | null
+  _count: {
+    coupons: number
+  }
 }
 
 export default function FeaturedStoresCarousel({
@@ -41,7 +44,9 @@ export default function FeaturedStoresCarousel({
               <p className="truncate text-[11px] font-medium text-[#222]">
                 {store.name}
               </p>
-              <p className="text-[10px] text-[#08b8b3]">0000 cupons</p>
+              <p className="text-[10px] text-[#08b8b3]">
+                {store._count.coupons} {store._count.coupons === 1 ? 'cupom' : 'cupons'}
+              </p>
             </div>
           </a>
         ))}

@@ -1,6 +1,6 @@
 'use client'
 
-import { CalendarDays, BadgePercent, CircleCheck } from 'lucide-react'
+import { CalendarDays, BadgePercent, CircleCheck, Columns3 } from 'lucide-react'
 
 type Coupon = {
   id: number
@@ -10,10 +10,28 @@ type Coupon = {
   couponType: 'coupon' | 'offer'
   redirectUrl: string | null
   isVerified: boolean
+  expiresAt?: string | Date | null
   store: {
     name: string
     logoUrl: string | null
+    _count?: {
+      coupons: number
+    }
   }
+}
+
+function formatDate(date?: string | Date | null) {
+  if (!date) return 'Sem validade'
+
+  const parsed = new Date(date)
+
+  if (Number.isNaN(parsed.getTime())) return 'Sem validade'
+
+  return parsed.toLocaleDateString('pt-BR')
+}
+
+function getCouponTypeLabel(type: 'coupon' | 'offer') {
+  return type === 'coupon' ? 'Cupom' : 'Promoção'
 }
 
 export default function CouponsList({
@@ -43,7 +61,6 @@ export default function CouponsList({
           className="rounded-[18px] bg-[#f1f1f1] px-5 py-3 shadow-sm ring-1 ring-black/10"
         >
           <div className="grid items-center gap-4 md:grid-cols-[150px_1fr_118px_92px]">
-            {/* LOGO */}
             <div className="flex h-[70px] w-[150px] items-center justify-center overflow-hidden rounded-[16px]">
               {coupon.store.logoUrl ? (
                 <img
@@ -58,7 +75,6 @@ export default function CouponsList({
               )}
             </div>
 
-            {/* CONTEÚDO */}
             <div className="min-w-0">
               <h3 className="font-title truncate text-[20px] uppercase leading-none tracking-tight text-[#111]">
                 {coupon.title}
@@ -67,17 +83,17 @@ export default function CouponsList({
               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] font-medium text-[#3f3f3f]">
                 <span className="inline-flex items-center gap-1">
                   <CalendarDays className="h-[10px] w-[10px]" />
-                  Validade 00/00
+                  Validade {formatDate(coupon.expiresAt)}
                 </span>
 
                 <span className="inline-flex items-center gap-1">
-                  <span className="text-[10px]">◫</span>
-                  0000 cupons disponíveis
+                  <Columns3 className="h-[10px] w-[10px]" />
+                  {coupon.store._count?.coupons ?? 0} cupons disponíveis
                 </span>
 
                 <span className="inline-flex items-center gap-1">
                   <BadgePercent className="h-[10px] w-[10px]" />
-                  Cupom/Promoção
+                  {getCouponTypeLabel(coupon.couponType)}
                 </span>
 
                 {coupon.isVerified && (
@@ -89,11 +105,10 @@ export default function CouponsList({
               </div>
             </div>
 
-            {/* CTA */}
             <div className="flex justify-start md:justify-center">
               <button
                 onClick={() => openCoupon(coupon)}
-                className="font-title flex h-[78px] w-[108px] items-center justify-center rounded-[16px] bg-[#19b8b5] px-3 text-center text-[23px] uppercase leading-[0.88] text-white transition hover:opacity-90"
+                className="font-title flex h-[78px] w-[108px] items-center justify-center rounded-[16px] bg-[#19b8b5] px-3 text-center text-[18px] uppercase leading-[0.88] text-white transition hover:opacity-90"
               >
                 <span>
                   Resgatar
@@ -103,8 +118,7 @@ export default function CouponsList({
               </button>
             </div>
 
-            {/* DESCONTO */}
-            <div className="text-center">
+            <div className="text-left md:text-right">
               <p className="font-title text-[34px] leading-none tracking-tight text-[#111]">
                 {coupon.discountValue ? `${coupon.discountValue}%` : '—'}
               </p>

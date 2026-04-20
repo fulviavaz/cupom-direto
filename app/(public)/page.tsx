@@ -4,33 +4,55 @@ import HomeSearch from '@/components/home-search'
 import FeaturedStoresCarousel from '@/components/featured-stores-carousel'
 
 export default async function HomePage() {
-  const featuredStores = await prisma.store.findMany({
-    where: {
-      isActive: true,
-      isFeatured: true,
-    },
-    orderBy: {
-      updatedAt: 'desc',
-    },
-    take: 6,
-  })
-
-  const featuredCoupons = await prisma.coupon.findMany({
-    where: {
-      isActive: true,
-      isFeatured: true,
-    },
-    include: {
-      store: true,
-      category: true,
-      couponTags: {
-        include: {
-          tag: true,
+const featuredStores = await prisma.store.findMany({
+  where: {
+    isActive: true,
+    isFeatured: true,
+  },
+  orderBy: {
+    updatedAt: 'desc',
+  },
+  take: 6,
+  include: {
+    _count: {
+      select: {
+        coupons: {
+          where: {
+            isActive: true,
+          },
         },
       },
     },
-    take: 6,
-  })
+  },
+})
+const featuredCoupons = await prisma.coupon.findMany({
+  where: {
+    isActive: true,
+    isFeatured: true,
+  },
+  include: {
+    store: {
+      include: {
+        _count: {
+          select: {
+            coupons: {
+              where: {
+                isActive: true,
+              },
+            },
+          },
+        },
+      },
+    },
+    category: true,
+    couponTags: {
+      include: {
+        tag: true,
+      },
+    },
+  },
+  take: 6,
+})
 
   const specialTags = await prisma.tag.findMany({
     where: {
@@ -40,17 +62,29 @@ export default async function HomePage() {
     include: {
       couponTags: {
         include: {
-          coupon: {
-            include: {
-              store: true,
-              category: true,
-              couponTags: {
-                include: {
-                  tag: true,
-                },
+      coupon: {
+  include: {
+    store: {
+      include: {
+        _count: {
+          select: {
+            coupons: {
+              where: {
+                isActive: true,
               },
             },
           },
+        },
+      },
+    },
+    category: true,
+    couponTags: {
+      include: {
+        tag: true,
+      },
+    },
+  },
+},
         },
       },
     },
@@ -65,22 +99,34 @@ export default async function HomePage() {
       .filter((coupon) => coupon.isActive)
       .slice(0, 6) ?? []
 
-  const extraCoupons = await prisma.coupon.findMany({
-    where: {
-      isActive: true,
-      isFeatured: false,
-    },
-    include: {
-      store: true,
-      category: true,
-      couponTags: {
-        include: {
-          tag: true,
+const extraCoupons = await prisma.coupon.findMany({
+  where: {
+    isActive: true,
+    isFeatured: false,
+  },
+  include: {
+    store: {
+      include: {
+        _count: {
+          select: {
+            coupons: {
+              where: {
+                isActive: true,
+              },
+            },
+          },
         },
       },
     },
-    take: 6,
-  })
+    category: true,
+    couponTags: {
+      include: {
+        tag: true,
+      },
+    },
+  },
+  take: 6,
+})
 
   const totalCoupons = await prisma.coupon.count({
     where: { isActive: true },
