@@ -21,10 +21,10 @@ export default function ClicksChart({ data }: Props) {
     <div className="h-80 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
-          <XAxis dataKey="date" />
-          <YAxis />
+          <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+          <YAxis tick={{ fontSize: 12 }} />
           <Tooltip />
-          <Line type="monotone" dataKey="clicks" />
+          <Line type="monotone" dataKey="clicks" strokeWidth={3} dot={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>
