@@ -3,100 +3,135 @@ import CouponsList from '@/components/coupons-list'
 
 type Props = {
   searchParams: Promise<{
-    categoria?: string
     search?: string
+    categoria?: string
   }>
 }
 
 export default async function CouponsPage({ searchParams }: Props) {
-  const { categoria, search } = await searchParams
+  const { search, categoria } = await searchParams
 
-  const normalizedSearch = search?.trim() || ''
+  const searchTerm = search?.trim() || ''
+  const categorySlug = categoria?.trim() || ''
 
   const coupons = await prisma.coupon.findMany({
     where: {
       isActive: true,
-
-      ...(categoria
+      ...(searchTerm || categorySlug
         ? {
-            couponTags: {
-              some: {
-                tag: {
-                  slug: categoria,
-                  type: 'categoria',
-                  isActive: true,
-                },
-              },
-            },
-          }
-        : {}),
-
-      ...(normalizedSearch
-        ? {
-            OR: [
-              {
-                title: {
-                  contains: normalizedSearch,
-                },
-              },
-              {
-                description: {
-                  contains: normalizedSearch,
-                },
-              },
-              {
-                store: {
-                  name: {
-                    contains: normalizedSearch,
-                  },
-                },
-              },
+            AND: [
+              ...(categorySlug
+                ? [
+                    {
+                      category: {
+                        slug: categorySlug,
+                      },
+                    },
+                  ]
+                : []),
+              ...(searchTerm
+                ? [
+                    {
+                      OR: [
+                        {
+                          title: {
+                            contains: searchTerm,
+                          },
+                        },
+                        {
+                          description: {
+                            contains: searchTerm,
+                          },
+                        },
+                        {
+                          code: {
+                            contains: searchTerm,
+                          },
+                        },
+                        {
+                          rules: {
+                            contains: searchTerm,
+                          },
+                        },
+                        {
+                          store: {
+                            name: {
+                              contains: searchTerm,
+                            },
+                          },
+                        },
+                        {
+                          category: {
+                            name: {
+                              contains: searchTerm,
+                            },
+                          },
+                        },
+                        {
+                          couponTags: {
+                            some: {
+                              tag: {
+                                name: {
+                                  contains: searchTerm,
+                                },
+                              },
+                            },
+                          },
+                        },
+                      ],
+                    },
+                  ]
+                : []),
             ],
           }
         : {}),
     },
     include: {
-      store: true,
+      store: {
+        include: {
+          _count: {
+            select: {
+              coupons: {
+                where: {
+                  isActive: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      category: true,
       couponTags: {
         include: {
           tag: true,
         },
       },
     },
-    orderBy: {
-      createdAt: 'desc',
-    },
+    orderBy: [
+      {
+        isFeatured: 'desc',
+      },
+      {
+        createdAt: 'desc',
+      },
+    ],
   })
 
-  const selectedCategory = categoria
-    ? await prisma.tag.findFirst({
-        where: {
-          slug: categoria,
-          type: 'categoria',
-          isActive: true,
-        },
-      })
-    : null
-
   return (
-    <main className="min-h-screen bg-gray-50 py-10">
-      <div className="mx-auto max-w-6xl px-6">
+    <main className="bg-[#f3f3f3]">
+      <div className="mx-auto max-w-[1440px] px-6 py-10 md:px-10">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            {selectedCategory
-              ? `Cupons em ${selectedCategory.name}`
-              : 'Cupons disponíveis'}
+          <h1 className="text-5xl font-title uppercase text-[#111]">
+            Cupons disponíveis
           </h1>
 
-          <p className="mt-2 text-gray-600">
-            {selectedCategory
-              ? `Confira os cupons ativos da categoria ${selectedCategory.name}.`
-              : 'Encontre ofertas, descontos e cupons ativos das lojas cadastradas.'}
+          <p className="mt-3 text-lg text-[#666]">
+            Encontre ofertas, descontos e cupons ativos das lojas cadastradas.
           </p>
 
-          {normalizedSearch && (
-            <p className="mt-3 text-sm text-gray-500">
-              Resultado da busca por: <span className="font-semibold text-gray-700">"{normalizedSearch}"</span>
+          {searchTerm && (
+            <p className="mt-5 text-base text-[#666]">
+              Resultado da busca por: <strong>"{searchTerm}"</strong>
             </p>
           )}
         </div>

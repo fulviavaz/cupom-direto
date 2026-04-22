@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { getTagIcon } from '@/lib/tag-icons'
 import CouponsList from '@/components/coupons-list'
 import HomeSearch from '@/components/home-search'
+import SiteStatsFooter from '@/components/site-stats-footer'
 
 type Props = {
   params: Promise<{
@@ -65,6 +66,39 @@ export default async function CategoryPage({ params }: Props) {
   const totalStores = uniqueStoreIds.size
 
   const Icon = getTagIcon(category.icon)
+
+  const totalCouponsGlobal = await prisma.coupon.count({
+  where: {
+    isActive: true,
+  },
+})
+
+const totalOffersGlobal = await prisma.coupon.count({
+  where: {
+    isActive: true,
+    couponType: 'offer',
+  },
+})
+
+const totalStoresGlobal = await prisma.store.count({
+  where: {
+    isActive: true,
+  },
+})
+
+const totalCategoriesGlobal = await prisma.tag.count({
+  where: {
+    type: 'categoria',
+    isActive: true,
+  },
+})
+
+const totalSpecialDatesGlobal = await prisma.tag.count({
+  where: {
+    type: 'especial',
+    isActive: true,
+  },
+})
 
   return (
     <main className="bg-[#f3f3f3]">
@@ -182,15 +216,7 @@ export default async function CategoryPage({ params }: Props) {
           </div>
         </section>
 
-        <section className="mb-20">
-          <div className="grid grid-cols-2 gap-3 rounded-[20px] bg-[#ececec] p-6 md:grid-cols-5">
-            <MetricFooter value={17452} label="Cupons" />
-            <MetricFooter value={8846} label="Promoções" />
-            <MetricFooter value={1133} label="Lojas" />
-            <MetricFooter value={170} label="Categorias" />
-            <MetricFooter value={12} label="Datas especiais" />
-          </div>
-        </section>
+      <SiteStatsFooter />
       </div>
     </main>
   )

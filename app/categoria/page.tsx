@@ -3,6 +3,7 @@ import { getTagIcon } from '@/lib/tag-icons'
 import HomeSearch from '@/components/home-search'
 import Link from 'next/link'
 import CategoryLetterNav from '@/components/category-letter-nav'
+import SiteStatsFooter from '@/components/site-stats-footer'
 
 export default async function CategoriaIndexPage() {
   const categories = await prisma.tag.findMany({
@@ -214,16 +215,7 @@ export default async function CategoriaIndexPage() {
             </div>
           </div>
         </section>
-
-        <section className="mb-20">
-          <div className="grid grid-cols-2 gap-3 rounded-[20px] bg-[#ececec] p-6 md:grid-cols-5">
-            <MetricFooter value={totalCoupons} label="Cupons" />
-            <MetricFooter value={totalOffers} label="Promoções" />
-            <MetricFooter value={totalStores} label="Lojas" />
-            <MetricFooter value={totalCategories} label="Categorias" />
-            <MetricFooter value={totalSpecialDates} label="Datas especiais" />
-          </div>
-        </section>
+<SiteStatsFooter />
       </div>
     </main>
   )

@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import CouponsList from '@/components/coupons-list'
 import HomeSearch from '@/components/home-search'
 import FeaturedStoresCarousel from '@/components/featured-stores-carousel'
+import SiteStatsFooter from '@/components/site-stats-footer'
 
 export default async function HomePage() {
 const featuredStores = await prisma.store.findMany({
@@ -257,36 +258,7 @@ const extraCoupons = await prisma.coupon.findMany({
           </div>
         </section>
 
-        <section className="mb-20">
-          <div className="grid grid-cols-2 gap-3 rounded-[20px] bg-[#ececec] p-6 md:grid-cols-5">
-            <div className="text-center">
-              <p className="text-[28px] font-bold text-[#ef233c]">{totalCoupons}</p>
-              <p className="text-[10px] uppercase text-[#555]">Cupons</p>
-            </div>
-
-            <div className="text-center">
-              <p className="text-[28px] font-bold text-[#ef233c]">
-                {featuredCoupons.length}
-              </p>
-              <p className="text-[10px] uppercase text-[#555]">Promoções</p>
-            </div>
-
-            <div className="text-center">
-              <p className="text-[28px] font-bold text-[#ef233c]">{totalStores}</p>
-              <p className="text-[10px] uppercase text-[#555]">Lojas</p>
-            </div>
-
-            <div className="text-center">
-              <p className="text-[28px] font-bold text-[#ef233c]">{totalCategories}</p>
-              <p className="text-[10px] uppercase text-[#555]">Categorias</p>
-            </div>
-
-            <div className="text-center">
-              <p className="text-[28px] font-bold text-[#ef233c]">{totalSpecials}</p>
-              <p className="text-[10px] uppercase text-[#555]">Datas especiais</p>
-            </div>
-          </div>
-        </section>
+      <SiteStatsFooter />
       </div>
     </main>
   )
