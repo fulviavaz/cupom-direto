@@ -1,6 +1,8 @@
-import { prisma } from '@/lib/prisma'
-import CouponsList from '@/components/coupons-list'
 import { notFound } from 'next/navigation'
+import { prisma } from '@/lib/prisma'
+import { getTagIcon } from '@/lib/tag-icons'
+import CouponsList from '@/components/coupons-list'
+import HomeSearch from '@/components/home-search'
 
 type Props = {
   params: Promise<{
@@ -11,114 +13,219 @@ type Props = {
 export default async function CategoryPage({ params }: Props) {
   const { slug } = await params
 
-  const tag = await prisma.tag.findFirst({
+  const category = await prisma.tag.findFirst({
     where: {
       slug,
       type: 'categoria',
       isActive: true,
     },
+  })
+
+  if (!category) {
+    notFound()
+  }
+
+  const coupons = await prisma.coupon.findMany({
+    where: {
+      isActive: true,
+      categoryId: category.id,
+    },
     include: {
-      couponTags: {
+      store: {
         include: {
-          coupon: {
-            include: {
-              store: true,
-              couponTags: {
-                include: {
-                  tag: true,
+          _count: {
+            select: {
+              coupons: {
+                where: {
+                  isActive: true,
                 },
               },
             },
           },
         },
       },
+      category: true,
+      couponTags: {
+        include: {
+          tag: true,
+        },
+      },
     },
+    orderBy: [
+      { isFeatured: 'desc' },
+      { createdAt: 'desc' },
+    ],
   })
 
-  if (!tag) notFound()
+  const totalCoupons = coupons.length
+  const totalOffers = coupons.filter((coupon) => coupon.couponType === 'offer').length
+  const totalDiscountCodes = coupons.filter((coupon) => coupon.couponType === 'coupon').length
 
-  const coupons = tag.couponTags
-    .map((item) => item.coupon)
-    .filter((coupon) => coupon.isActive)
+  const uniqueStoreIds = new Set(coupons.map((coupon) => coupon.storeId))
+  const totalStores = uniqueStoreIds.size
 
-  const bestDiscount = coupons.reduce((max, c) => {
-    const value = c.discountValue ?? 0
-    return value > max ? value : max
-  }, 0)
+  const Icon = getTagIcon(category.icon)
 
   return (
-    <main className="min-h-screen bg-[#f5f5f5] py-10">
-      <div className="mx-auto max-w-6xl space-y-8 px-6">
-
-        {/* HEADER */}
-        <section className="overflow-hidden rounded-3xl bg-white p-8 shadow-sm ring-1 ring-gray-200">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+    <main className="bg-[#f3f3f3]">
+      <div className="mx-auto max-w-[1440px] px-10 pt-10">
+        {/* TOPO */}
+        <section className="mb-14">
+          <div className="grid items-end gap-8 md:grid-cols-[280px_1fr]">
+            <div className="flex items-end justify-center md:justify-start">
+              <img
+                src="/logo-cupom-direto.png"
+                alt="Cupom Direto"
+                className="h-auto w-[280px] object-contain"
+              />
+            </div>
 
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-red-600">
-                Categoria
-              </p>
-
-              <h1 className="mt-2 text-3xl font-bold text-gray-900 md:text-4xl">
-                {tag.name}
+              <h1 className="font-title mb-6 text-center text-[46px] uppercase leading-[0.95] tracking-tight text-[#111] md:text-left">
+                Conectando você com os melhores cupons!
               </h1>
 
-              <p className="mt-3 max-w-2xl text-gray-600">
-                Explore os melhores cupons e ofertas disponíveis nesta categoria.
-              </p>
+              <HomeSearch />
             </div>
-
-            <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-red-50 text-3xl text-red-600">
-              {tag.icon || '🏷️'}
-            </div>
-
           </div>
         </section>
 
-        {/* RESUMO */}
-        <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {/* BLOCO DA CATEGORIA */}
+        <section className="mb-12">
+          <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
+            {/* CARD ESQUERDA */}
+            <div>
+              <h2 className="font-title mb-5 text-[28px] uppercase leading-none text-[#ef233c]">
+                Categoria selecionada
+              </h2>
 
-            <div className="rounded-2xl bg-gray-50 p-5">
-              <p className="text-sm text-gray-500">Total de cupons</p>
-              <p className="mt-2 text-3xl font-bold text-red-600">
-                {coupons.length}
-              </p>
+              <div className="flex min-h-[156px] items-center gap-5 rounded-[20px] bg-[#ef233c] px-7 py-6 text-white">
+                <div className="shrink-0">
+                  <Icon className="h-[68px] w-[68px]" strokeWidth={1.8} />
+                </div>
+
+                <div>
+                  <p className="font-title text-[34px] uppercase leading-none tracking-tight">
+                    {category.name}
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="rounded-2xl bg-gray-50 p-5">
-              <p className="text-sm text-gray-500">Melhor desconto</p>
-              <p className="mt-2 text-3xl font-bold text-red-600">
-                {bestDiscount > 0 ? `${bestDiscount}%` : '--'}
-              </p>
-            </div>
+            {/* RESUMO */}
+            <div>
+              <h2 className="font-title mb-5 text-[28px] uppercase leading-none text-[#111]">
+                Resumo da categoria
+              </h2>
 
-            <div className="rounded-2xl bg-gray-50 p-5">
-              <p className="text-sm text-gray-500">Categoria ativa</p>
-              <p className="mt-2 text-2xl font-bold text-gray-900">
-                {tag.name}
-              </p>
+              <div className="grid grid-cols-2 gap-4 rounded-[20px] bg-[#ececec] p-6 md:grid-cols-4">
+                <MetricCard
+                  value={totalDiscountCodes}
+                  label="Códigos de descontos"
+                />
+                <MetricCard
+                  value={totalOffers}
+                  label="Ofertas"
+                />
+                <MetricCard
+                  value={totalCoupons}
+                  label="Número de cupons"
+                />
+                <MetricCard
+                  value={totalStores}
+                  label="Lojas"
+                />
+              </div>
             </div>
-
           </div>
         </section>
 
-        {/* TÍTULO */}
-        <section className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Cupons disponíveis
+        {/* CUPONS */}
+        <section className="mb-16">
+          <div className="mb-5 flex items-center justify-between">
+            <h2 className="font-title text-[28px] uppercase leading-none text-[#ef233c]">
+              Cupons em destaque
             </h2>
-            <p className="mt-1 text-gray-600">
-              Confira os cupons e ofertas desta categoria.
-            </p>
+
+            <a
+              href="/coupons"
+              className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wide text-[#111] hover:text-[#ef233c]"
+            >
+              <span className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[#ef233c] text-[12px] text-white">
+                +
+              </span>
+              Buscar mais cupons
+            </a>
+          </div>
+
+          <CouponsList coupons={coupons} />
+        </section>
+
+        {/* BLOCO FINAL */}
+        <section className="mb-8">
+          <div className="grid items-end gap-8 md:grid-cols-[280px_1fr]">
+            <div className="flex items-end justify-center md:justify-start">
+              <img
+                src="/logo-cupom-direto.png"
+                alt="Cupom Direto"
+                className="h-auto w-[280px] object-contain"
+              />
+            </div>
+
+            <div>
+              <h2 className="font-title mb-6 text-center text-[46px] uppercase leading-[0.95] tracking-tight text-[#111] md:text-left">
+                Conectando você com os melhores cupons!
+              </h2>
+
+              <HomeSearch />
+            </div>
           </div>
         </section>
 
-        {/* LISTA */}
-        <CouponsList coupons={coupons} />
-
+        <section className="mb-20">
+          <div className="grid grid-cols-2 gap-3 rounded-[20px] bg-[#ececec] p-6 md:grid-cols-5">
+            <MetricFooter value={17452} label="Cupons" />
+            <MetricFooter value={8846} label="Promoções" />
+            <MetricFooter value={1133} label="Lojas" />
+            <MetricFooter value={170} label="Categorias" />
+            <MetricFooter value={12} label="Datas especiais" />
+          </div>
+        </section>
       </div>
     </main>
+  )
+}
+
+function MetricCard({
+  value,
+  label,
+}: {
+  value: number
+  label: string
+}) {
+  return (
+    <div className="text-center">
+      <p className="font-title text-[34px] leading-none text-[#ef233c]">
+        {String(value).padStart(2, '0')}
+      </p>
+      <p className="mt-2 text-[12px] font-medium uppercase leading-[1.1] text-[#222]">
+        {label}
+      </p>
+    </div>
+  )
+}
+
+function MetricFooter({
+  value,
+  label,
+}: {
+  value: number
+  label: string
+}) {
+  return (
+    <div className="text-center">
+      <p className="text-[28px] font-bold text-[#ef233c]">{value}</p>
+      <p className="text-[10px] uppercase text-[#555]">{label}</p>
+    </div>
   )
 }

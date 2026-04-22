@@ -31,17 +31,17 @@ export default async function CategoriesBar({ currentCategory }: Props) {
             return (
               <Link
                 key={cat.id}
-                href={`/coupons?categoria=${cat.slug}`}
-                className={`group flex min-w-[96px] flex-col items-center justify-center gap-[8px] rounded-[8px] px-2 py-1 text-center transition ${
+                href={`/categoria/${cat.slug}`}
+                className={`flex min-w-[92px] flex-col items-center justify-center gap-[8px] rounded-[8px] px-2 py-1 text-center transition ${
                   isActive ? 'bg-white/10' : 'hover:bg-white/10'
                 }`}
               >
                 <Icon
-                  className="h-[34px] w-[34px] text-white"
-                  strokeWidth={1.3}
+                  className="h-[23px] w-[23px] text-white"
+                  strokeWidth={1.8}
                 />
 
-                <span className="text-[12px] font-normal uppercase leading-[1.05] tracking-[0.02em] text-white">
+                <span className="text-[10px] font-extrabold uppercase leading-[1.05] tracking-[0.02em] text-white">
                   {cat.name}
                 </span>
               </Link>
@@ -49,14 +49,14 @@ export default async function CategoriesBar({ currentCategory }: Props) {
           })}
 
           <Link
-            href="/coupons"
-            className="group flex min-w-[96px] flex-col items-center justify-center gap-[8px] rounded-[8px] px-2 py-1 text-center transition hover:bg-white/10"
+            href="/categoria"
+            className="flex min-w-[92px] flex-col items-center justify-center gap-[8px] rounded-[8px] px-2 py-1 text-center transition hover:bg-white/10"
           >
-            <span className="flex h-[35px] w-[35px] items-center justify-center rounded-full bg-white text-[35px] font-medium leading-none text-[#ef0f23]">
+            <span className="flex h-[28px] w-[28px] items-center justify-center rounded-full bg-white text-[18px] font-bold leading-none text-[#ef0f23]">
               +
             </span>
 
-            <span className="text-[12px] font-normal uppercase leading-[1.05] tracking-[0.02em] text-white">
+            <span className="text-[10px] font-extrabold uppercase leading-[1.05] tracking-[0.02em] text-white">
               Ver todas
             </span>
           </Link>
