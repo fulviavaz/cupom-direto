@@ -1,11 +1,13 @@
 import Link from 'next/link'
 import LogoutButton from '@/components/logout-button'
 
+
 const navItems = [
   { href: '/admin', label: 'Dashboard' },
   { href: '/admin/coupons', label: 'Cupons' },
   { href: '/admin/stores', label: 'Lojas' },
   { href: '/admin/tags', label: 'Tags' },
+  { href: '/admin/imports', label: 'Importações' },
   { href: '/admin/users', label: 'Usuários' },
 ]
 

@@ -8,76 +8,76 @@ datasource db {
 }
 
 model Store {
-  id            Int      @id @default(autoincrement())
-  name          String
-  slug          String   @unique
-  logoUrl       String?
-  affiliateUrl  String?
-  description   String?
-  websiteUrl    String?
-  isFeatured    Boolean  @default(false)
-  isActive      Boolean  @default(true)
+  id           Int     @id @default(autoincrement())
+  name         String
+  slug         String  @unique
+  logoUrl      String?
+  affiliateUrl String?
+  description  String?
+  websiteUrl   String?
+  isFeatured   Boolean @default(false)
+  isActive     Boolean @default(true)
 
-  coupons       Coupon[]
+  coupons Coupon[]
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Tag {
-  id                Int      @id @default(autoincrement())
-  name              String
-  slug              String   @unique
-  icon              String?
-  type              TagType
-  isFeatured        Boolean  @default(false)
-  isActive          Boolean  @default(true)
+  id         Int     @id @default(autoincrement())
+  name       String
+  slug       String  @unique
+  icon       String?
+  type       TagType
+  isFeatured Boolean @default(false)
+  isActive   Boolean @default(true)
 
-  couponsAsCategory Coupon[] @relation("CouponCategory")
+  couponsAsCategory Coupon[]    @relation("CouponCategory")
   couponTags        CouponTag[]
 
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Coupon {
-  id             Int      @id @default(autoincrement())
-  title          String
-  description    String?
-  code           String?
-  rules          String?
-  discountText   String?
-  discountValue  Int?
-  couponType     CouponType
-  redirectUrl    String?
-  imageUrl       String?
+  id            Int        @id @default(autoincrement())
+  title         String
+  description   String?
+  code          String?
+  rules         String?
+  discountText  String?
+  discountValue Int?
+  couponType    CouponType
+  redirectUrl   String?
+  imageUrl      String?
 
-  storeId        Int
-  store          Store    @relation(fields: [storeId], references: [id])
+  storeId Int
+  store   Store @relation(fields: [storeId], references: [id])
 
   categoryId Int?
   category   Tag? @relation("CouponCategory", fields: [categoryId], references: [id])
 
-  couponTags     CouponTag[]
+  couponTags CouponTag[]
 
-  isFeatured     Boolean  @default(false)
-  isVerified     Boolean  @default(false)
-  isActive       Boolean  @default(true)
-  expiresAt      DateTime?
-  usesCount      Int      @default(0)
+  isFeatured Boolean   @default(false)
+  isVerified Boolean   @default(false)
+  isActive   Boolean   @default(true)
+  expiresAt  DateTime?
+  usesCount  Int       @default(0)
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   clicks ClickEvent[]
 }
 
 model CouponTag {
-  couponId   Int
-  tagId      Int
+  couponId Int
+  tagId    Int
 
-  coupon     Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
-  tag        Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([couponId, tagId])
 }
@@ -102,12 +102,30 @@ model ClickEvent {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  role      String   @default("admin")
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+  role     String @default("admin")
+
+  couponImportLogs CouponImportLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model CouponImportLog {
+  id           Int    @id @default(autoincrement())
+  fileName     String
+  uploadedById Int?
+  uploadedBy   User?  @relation(fields: [uploadedById], references: [id])
+
+  totalRows    Int @default(0)
+  successCount Int @default(0)
+  errorCount   Int @default(0)
+
+  status       String  @default("success")
+  errorSummary String? @db.Text
+
+  createdAt DateTime @default(now())
 }
