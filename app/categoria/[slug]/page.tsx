@@ -4,6 +4,7 @@ import { getTagIcon } from '@/lib/tag-icons'
 import CouponsList from '@/components/coupons-list'
 import HomeSearch from '@/components/home-search'
 import SiteStatsFooter from '@/components/site-stats-footer'
+import SiteHeroSearch from '@/components/site-hero-search'
 
 type Props = {
   params: Promise<{
@@ -104,25 +105,7 @@ const totalSpecialDatesGlobal = await prisma.tag.count({
     <main className="bg-[#f3f3f3]">
       <div className="mx-auto max-w-[1440px] px-10 pt-10">
         {/* TOPO */}
-        <section className="mb-14">
-          <div className="grid items-end gap-8 md:grid-cols-[280px_1fr]">
-            <div className="flex items-end justify-center md:justify-start">
-              <img
-                src="/logo-cupom-direto.png"
-                alt="Cupom Direto"
-                className="h-auto w-[280px] object-contain"
-              />
-            </div>
-
-            <div>
-              <h1 className="font-title mb-6 text-center text-[46px] uppercase leading-[0.95] tracking-tight text-[#111] md:text-left">
-                Conectando você com os melhores cupons!
-              </h1>
-
-              <HomeSearch />
-            </div>
-          </div>
-        </section>
+        <SiteHeroSearch />
 
         {/* BLOCO DA CATEGORIA */}
         <section className="mb-12">
@@ -196,25 +179,7 @@ const totalSpecialDatesGlobal = await prisma.tag.count({
         </section>
 
         {/* BLOCO FINAL */}
-        <section className="mb-8">
-          <div className="grid items-end gap-8 md:grid-cols-[280px_1fr]">
-            <div className="flex items-end justify-center md:justify-start">
-              <img
-                src="/logo-cupom-direto.png"
-                alt="Cupom Direto"
-                className="h-auto w-[280px] object-contain"
-              />
-            </div>
-
-            <div>
-              <h2 className="font-title mb-6 text-center text-[46px] uppercase leading-[0.95] tracking-tight text-[#111] md:text-left">
-                Conectando você com os melhores cupons!
-              </h2>
-
-              <HomeSearch />
-            </div>
-          </div>
-        </section>
+        <SiteHeroSearch />
 
       <SiteStatsFooter />
       </div>
