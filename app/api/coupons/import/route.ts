@@ -199,6 +199,22 @@ export async function POST(req: Request) {
 
                 const redirectUrl =
                     getString(row['Link afiliado']) || null
+                const discountText =
+                    getString(row['Texto desconto']) || null
+
+                const rawDiscountValue =
+                    getString(row['Valor desconto']) || ''
+
+                const parsedDiscountValue = Number(
+                    rawDiscountValue
+                        .replace('%', '')
+                        .replace(',', '.')
+                        .trim()
+                )
+
+                const discountValue = Number.isNaN(parsedDiscountValue)
+                    ? null
+                    : parsedDiscountValue
 
                 const brandRef = getString(row['Marca'])
 
@@ -375,11 +391,17 @@ export async function POST(req: Request) {
                             description,
                             rules: description,
                             redirectUrl,
+
+                            discountValue,
+                            discountText,
+
                             storeId: store.id,
                             categoryId: category.id,
+
                             couponType: code
                                 ? 'coupon'
                                 : 'offer',
+
                             expiresAt,
                         },
                     })
@@ -401,14 +423,19 @@ export async function POST(req: Request) {
                         description,
                         rules: description,
                         redirectUrl,
+
+                        discountValue,
+                        discountText,
+
                         storeId: store.id,
                         categoryId: category.id,
-                        couponType: code
-                            ? 'coupon'
-                            : 'offer',
+
+                        couponType: code ? 'coupon' : 'offer',
+
                         isActive,
                         isVerified: true,
                         isFeatured: priority === 0,
+
                         expiresAt,
                     },
                 })

@@ -47,7 +47,7 @@ model Coupon {
   code          String?
   rules         String?
   discountText  String?
-  discountValue Int?
+  discountValue Float?
   couponType    CouponType
   redirectUrl   String?
   imageUrl      String?

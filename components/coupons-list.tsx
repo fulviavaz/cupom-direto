@@ -19,6 +19,7 @@ type Coupon = {
   redirectUrl: string | null
   isVerified: boolean
   expiresAt?: string | Date | null
+  discountText: string | null
   store: {
     name: string
     logoUrl: string | null
@@ -99,6 +100,34 @@ export default function CouponsList({
     )
   }
 
+  function getDiscountDisplay(coupon: Coupon) {
+  if (coupon.discountText) {
+    return {
+      value: coupon.discountText,
+      label: '',
+    }
+  }
+
+  if (coupon.discountValue !== null && coupon.discountValue !== undefined) {
+    return {
+      value: `${coupon.discountValue}%`,
+      label: 'de desconto',
+    }
+  }
+
+  if (coupon.title.toLowerCase().includes('frete')) {
+    return {
+      value: 'Frete',
+      label: 'grátis',
+    }
+  }
+
+  return {
+    value: coupon.couponType === 'coupon' ? 'Cupom' : 'Oferta',
+    label: 'especial',
+  }
+}
+
   return (
     <>
       <div className="space-y-4">
@@ -165,14 +194,23 @@ export default function CouponsList({
                 </button>
               </div>
 
-              <div className="text-left md:text-right">
-                <p className="font-title text-[34px] leading-none tracking-tight text-[#111]">
-                  {coupon.discountValue ? `${coupon.discountValue}%` : '—'}
-                </p>
-                <p className="font-title mt-[2px] text-[16px] uppercase leading-none tracking-tight text-[#111]">
-                  de desconto
-                </p>
-              </div>
+            {(() => {
+  const discount = getDiscountDisplay(coupon)
+
+  return (
+    <div className="text-left md:text-right">
+      <p className="font-title text-[34px] uppercase leading-none tracking-tight text-[#111]">
+        {discount.value}
+      </p>
+
+      {discount.label && (
+        <p className="font-title mt-[2px] text-[16px] uppercase leading-none tracking-tight text-[#111]">
+          {discount.label}
+        </p>
+      )}
+    </div>
+  )
+})()}
             </div>
           </article>
         ))}
