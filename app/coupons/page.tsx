@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import CouponsList from '@/components/coupons-list'
+import { getPublicCouponWhere } from '@/lib/coupon-visibility'
 
 type Props = {
   searchParams: Promise<{
@@ -16,10 +17,13 @@ export default async function CouponsPage({ searchParams }: Props) {
 
   const coupons = await prisma.coupon.findMany({
     where: {
-      isActive: true,
+      ...getPublicCouponWhere(),
+
       ...(searchTerm || categorySlug
         ? {
             AND: [
+              ...getPublicCouponWhere().AND,
+
               ...(categorySlug
                 ? [
                     {
@@ -29,6 +33,7 @@ export default async function CouponsPage({ searchParams }: Props) {
                     },
                   ]
                 : []),
+
               ...(searchTerm
                 ? [
                     {
@@ -92,9 +97,7 @@ export default async function CouponsPage({ searchParams }: Props) {
           _count: {
             select: {
               coupons: {
-                where: {
-                  isActive: true,
-                },
+                where: getPublicCouponWhere(),
               },
             },
           },
@@ -121,7 +124,7 @@ export default async function CouponsPage({ searchParams }: Props) {
     <main className="bg-[#f3f3f3]">
       <div className="mx-auto max-w-[1440px] px-6 py-10 md:px-10">
         <div className="mb-8">
-          <h1 className="text-5xl font-title uppercase text-[#111]">
+          <h1 className="font-title text-[46px] uppercase leading-none text-[#111]">
             Cupons disponíveis
           </h1>
 

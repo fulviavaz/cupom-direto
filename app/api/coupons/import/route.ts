@@ -221,6 +221,8 @@ export async function POST(req: Request) {
                 const categoryRef =
                     getString(row['Categoria'])
 
+                const startsAt = getDate(row['Início cupom'])
+
                 const expiresAt = getDate(
                     row['Validade cupom']
                 )
@@ -402,6 +404,7 @@ export async function POST(req: Request) {
                                 ? 'coupon'
                                 : 'offer',
 
+                            startsAt,
                             expiresAt,
                         },
                     })
@@ -436,6 +439,7 @@ export async function POST(req: Request) {
                         isVerified: true,
                         isFeatured: priority === 0,
 
+                        startsAt,
                         expiresAt,
                     },
                 })

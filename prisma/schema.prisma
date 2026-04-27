@@ -63,6 +63,7 @@ model Coupon {
   isFeatured Boolean   @default(false)
   isVerified Boolean   @default(false)
   isActive   Boolean   @default(true)
+  startsAt DateTime?
   expiresAt  DateTime?
   usesCount  Int       @default(0)
 
