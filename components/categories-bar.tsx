@@ -60,6 +60,19 @@ export default async function CategoriesBar({ currentCategory }: Props) {
               Ver todas
             </span>
           </Link>
+
+          <Link
+  href="/especiais"
+  className="flex min-w-[96px] flex-col items-center justify-center gap-[8px] rounded-[8px] px-2 py-1 text-center transition hover:bg-white/10"
+>
+  <span className="flex h-[28px] w-[28px] items-center justify-center rounded-full bg-white text-[14px] font-bold leading-none text-[#ef0f23]">
+    ★
+  </span>
+
+  <span className="text-[10px] font-extrabold uppercase leading-[1.05] tracking-[0.02em] text-white">
+    Especiais
+  </span>
+</Link>
         </div>
       </div>
     </div>
