@@ -24,6 +24,14 @@ export async function PUT(req: Request, context: Context) {
     const rules = body.rules?.trim() || null
     const discountText = body.discountText?.trim() || null
 
+    const startsAt = body.startsAt
+      ? new Date(body.startsAt)
+      : null
+
+    const expiresAt = body.expiresAt
+      ? new Date(body.expiresAt)
+      : null
+
     const discountValue =
       body.discountValue !== '' &&
         body.discountValue !== null &&
@@ -53,7 +61,7 @@ export async function PUT(req: Request, context: Context) {
     const isFeatured = body.isFeatured ?? false
     const isVerified = body.isVerified ?? false
     const isActive = body.isActive ?? true
-    const expiresAt = body.expiresAt ? new Date(body.expiresAt) : null
+
 
     // validações
     if (!title) {
@@ -137,6 +145,7 @@ export async function PUT(req: Request, context: Context) {
         isFeatured,
         isVerified,
         isActive,
+        startsAt,
         expiresAt,
 
         // 👇 remove antigas e recria

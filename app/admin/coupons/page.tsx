@@ -90,6 +90,7 @@ export default function AdminCouponsPage() {
   const [isFeatured, setIsFeatured] = useState(false)
   const [isVerified, setIsVerified] = useState(false)
   const [isActive, setIsActive] = useState(true)
+  const [startsAt, setStartsAt] = useState('')
   const [expiresAt, setExpiresAt] = useState('')
 
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -273,6 +274,7 @@ export default function AdminCouponsPage() {
           isFeatured,
           isVerified,
           isActive,
+          startsAt,
           expiresAt,
         }),
       })
@@ -735,6 +737,19 @@ export default function AdminCouponsPage() {
                   <option value="inativo">Inativo</option>
                 </select>
               </div>
+
+              <div>
+  <label className="mb-2 block text-sm font-medium text-gray-700">
+    Início da validade
+  </label>
+
+  <input
+    type="datetime-local"
+    value={startsAt}
+    onChange={(e) => setStartsAt(e.target.value)}
+  className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-black"
+  />
+</div>
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">

@@ -71,6 +71,7 @@ export async function POST(req: Request) {
     const isFeatured = body.isFeatured ?? false
     const isVerified = body.isVerified ?? false
     const isActive = body.isActive ?? true
+    const startsAt = body.startsAt ? new Date(body.startsAt) : null
     const expiresAt = body.expiresAt ? new Date(body.expiresAt) : null
 
     if (!title) {
@@ -146,6 +147,7 @@ export async function POST(req: Request) {
         isFeatured,
         isVerified,
         isActive,
+        startsAt,
         expiresAt,
         couponTags: {
           create: tagIds.map((tagId: number) => ({
